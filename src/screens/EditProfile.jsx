@@ -7,9 +7,10 @@ import {
   StyleSheet,
   ScrollView,
   Button,
+  TouchableOpacity,
 } from 'react-native';
 import ButtonSave from '../components/Button';
-import DatePicker from 'react-native-date-picker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import React from 'react';
 import {RadioButton} from 'react-native-paper';
 import http from '../helpers/http';
@@ -18,6 +19,7 @@ import Input from '../components/Input';
 import {Formik} from 'formik';
 import moment from 'moment/moment';
 import Alert from '../components/Alert';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 const EditProfile = () => {
   const [profile, setProfile] = React.useState({});
@@ -29,10 +31,35 @@ const EditProfile = () => {
   const [editUsername, setEditUsername] = React.useState(false);
   const [editEmail, setEditEmail] = React.useState(false);
   const [editPhoneNumber, setEditPhoneNumber] = React.useState(false);
-  const [selectedPicture, setSelectedPicture] = React.useState(false);
+  const [selectedPicture, setSelectedPicture] = React.useState('');
   const [imageUrl, setImageUrl] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
   // const [loading, setLoading] = React.useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = React.useState(false);
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = date => {
+    console.log('A date has been picked: ', moment(date).format('DD-MM-YYYY'));
+    hideDatePicker();
+  };
+
+  const ImagePicker = () => {
+    let options = {
+      storageOptions: {
+        path: 'image',
+      },
+    };
+    launchImageLibrary(options, response => {
+      setSelectedPicture(response.assets[0].uri);
+    });
+  };
 
   React.useEffect(() => {
     const getProfile = async () => {
@@ -97,8 +124,12 @@ const EditProfile = () => {
       {({handleSubmit, handleChange, handleBlur, errors, touched, values}) => (
         <ScrollView>
           {successMessage && <Alert variant="success">{successMessage}</Alert>}
-          <View style={{alignSelf: 'center', marginVertical: 30}}>
-            {profile.picture === null ? (
+          <TouchableOpacity
+            onPress={() => {
+              ImagePicker();
+            }}
+            style={{alignSelf: 'center', marginVertical: 30}}>
+            {profile.picture === null || profile.picture === undefined ? (
               <Image
                 style={styles.picture}
                 source={require('./assets/daw.jpg')}
@@ -106,10 +137,14 @@ const EditProfile = () => {
             ) : (
               <Image
                 style={styles.picture}
-                source={{uri: `${profile.picture}`}}
+                source={
+                  selectedPicture
+                    ? {uri: selectedPicture}
+                    : {uri: profile.picture}
+                }
               />
             )}
-          </View>
+          </TouchableOpacity>
           <View style={{marginHorizontal: 30}}>
             <View>
               <SafeAreaView style={styles.safeAreaView}>
@@ -127,13 +162,18 @@ const EditProfile = () => {
                   <Text style={{fontWeight: '700'}}>Username</Text>
                   <View style={{flexDirection: 'row', gap: 30}}>
                     {!editUsername && (
-                      <>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 30,
+                        }}>
                         <Text>{profile.username}</Text>
                         <Button
                           title="Edit"
                           onPress={() => setEditUsername(true)}
                         />
-                      </>
+                      </View>
                     )}
                     {editUsername && (
                       <Input
@@ -149,13 +189,18 @@ const EditProfile = () => {
                   <Text style={{fontWeight: '700'}}>Email</Text>
                   <View style={{flexDirection: 'row', gap: 30}}>
                     {!editEmail && (
-                      <>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 30,
+                        }}>
                         <Text>{profile.email}</Text>
                         <Button
                           title="Edit"
                           onPress={() => setEditEmail(true)}
                         />
-                      </>
+                      </View>
                     )}
                     {editEmail && (
                       <Input
@@ -171,13 +216,18 @@ const EditProfile = () => {
                   <Text style={{fontWeight: '700'}}>Phone</Text>
                   <View style={{flexDirection: 'row', gap: 30}}>
                     {!editPhoneNumber && (
-                      <>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 30,
+                        }}>
                         <Text>{profile.phoneNumber}</Text>
                         <Button
                           title="Edit"
                           onPress={() => setEditPhoneNumber(true)}
                         />
-                      </>
+                      </View>
                     )}
                     {editPhoneNumber && (
                       <Input
@@ -227,23 +277,17 @@ const EditProfile = () => {
                     value={text}
                     placeholder="Full Name"
                   />
-                </View>
+                </View> */}
                 <View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Birthday Date</Text>
-                  <Button title="Open" onPress={() => setOpen(true)} />
-                  <DatePicker
-                    modal
-                    open={open}
-                    date={date}
-                    onConfirm={date => {
-                      setOpen(false);
-                      setDate(date);
-                    }}
-                    onCancel={() => {
-                      setOpen(false);
-                    }}
+                  <Button title="Show Date Picker" onPress={showDatePicker} />
+                  <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    onConfirm={handleConfirm}
+                    onCancel={hideDatePicker}
                   />
-                </View> */}
+                </View>
                 {/* <View
                   style={{
                     borderWidth: 1,

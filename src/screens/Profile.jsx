@@ -25,7 +25,7 @@ const Profile = () => {
           gap: 20,
           justifyContent: 'center',
         }}>
-        {profile.picture === null ? (
+        {profile.picture === null || profile.picture === undefined ? (
           <Image style={styles.picture} source={require('./assets/daw.jpg')} />
         ) : (
           <Image style={styles.picture} source={{uri: `${profile.picture}`}} />
