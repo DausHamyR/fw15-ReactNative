@@ -1,12 +1,23 @@
 import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
-import React from 'react';
+import React, {useCallback} from 'react';
 import Icon from 'react-native-vector-icons/Feather';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {logout} from '../redux/reducers/auth';
 import Button from '../components/Button';
+import http from '../helpers/http';
 
 const Home = ({navigation}) => {
   const dispatch = useDispatch();
+  const deviceToken = useSelector(state => state.deviceToken.data);
+  const token = useSelector(state => state.auth.token);
+  const saveToken = useCallback(async () => {
+    const form = new URLSearchParams({token: deviceToken.token});
+    await http(token).post('/device-token', form.toString());
+  }, [deviceToken, token]);
+
+  React.useEffect(() => {
+    saveToken();
+  }, [saveToken]);
 
   return (
     <View>
