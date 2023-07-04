@@ -2,7 +2,6 @@ import {
   View,
   Text,
   Image,
-  TextInput,
   SafeAreaView,
   StyleSheet,
   ScrollView,
@@ -25,17 +24,15 @@ const EditProfile = () => {
   const [profile, setProfile] = React.useState({});
   const [text, onChangeText] = React.useState('');
   const [checked, setChecked] = React.useState('male');
-  const [date, setDate] = React.useState(new Date());
-  const [open, setOpen] = React.useState(false);
   const token = useSelector(state => state.auth.token);
   const [editUsername, setEditUsername] = React.useState(false);
   const [editEmail, setEditEmail] = React.useState(false);
   const [editPhoneNumber, setEditPhoneNumber] = React.useState(false);
   const [selectedPicture, setSelectedPicture] = React.useState('');
-  const [imageUrl, setImageUrl] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
   // const [loading, setLoading] = React.useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = React.useState(false);
+  const [selectedDate, setSelectedDate] = React.useState('');
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -46,7 +43,7 @@ const EditProfile = () => {
   };
 
   const handleConfirm = date => {
-    console.log('A date has been picked: ', moment(date).format('DD-MM-YYYY'));
+    setSelectedDate(date.toISOString().slice(0, 10));
     hideDatePicker();
   };
 
@@ -71,10 +68,9 @@ const EditProfile = () => {
 
   const editProfile = async values => {
     // setLoading(true);
-    console.log('1');
     const form = new FormData();
     Object.keys(values).forEach(key => {
-      console.log('2');
+      console.log(values);
       if (values[key]) {
         if (key === 'birthDate') {
           form.append(
@@ -89,16 +85,14 @@ const EditProfile = () => {
     if (selectedPicture) {
       form.append('picture', selectedPicture);
     }
-    console.log('3');
+    console.log('masuk');
     const {data} = await http(token).patch('/profile', form, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log('4');
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
-    // setEditBirthday(false);
     setEditUsername(false);
     setEditEmail(false);
     setEditPhoneNumber(false);
@@ -115,9 +109,8 @@ const EditProfile = () => {
         // gender: profile?.gender ? 'male' : 'female',
         // profession: profile?.profession,
         // nationality: profile?.nationality,
-        // birthDate:
-        //   profile?.birthDate &&
-        //   moment(profile.birthDate).format('YYYY/MM/DD'),
+        birthDate:
+          profile?.birthDate && moment(profile.birthDate).format('YYYY/MM/DD'),
       }}
       onSubmit={editProfile}
       enableReinitialize>
@@ -280,13 +273,22 @@ const EditProfile = () => {
                 </View> */}
                 <View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Birthday Date</Text>
-                  <Button title="Show Date Picker" onPress={showDatePicker} />
-                  <DateTimePickerModal
-                    isVisible={isDatePickerVisible}
-                    mode="date"
-                    onConfirm={handleConfirm}
-                    onCancel={hideDatePicker}
-                  />
+                  <TouchableOpacity onPress={showDatePicker}>
+                    <Input
+                      style={styles.input}
+                      onChangeText={handleChange('birthDate')}
+                      onBlur={handleBlur('birthDate')}
+                      value={values.birthDate}
+                      placeholder="Select Date"
+                      editable={false}
+                    />
+                    <DateTimePickerModal
+                      isVisible={isDatePickerVisible}
+                      mode="date"
+                      onConfirm={handleConfirm}
+                      onCancel={hideDatePicker}
+                    />
+                  </TouchableOpacity>
                 </View>
                 {/* <View
                   style={{
