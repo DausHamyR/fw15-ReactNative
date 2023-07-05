@@ -23,7 +23,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 const EditProfile = () => {
   const [profile, setProfile] = React.useState({});
   const [text, onChangeText] = React.useState('');
-  const [checked, setChecked] = React.useState(profile.gender ? '1' : '0');
+  const [checked, setChecked] = React.useState('0');
   const token = useSelector(state => state.auth.token);
   const [editUsername, setEditUsername] = React.useState(false);
   const [editEmail, setEditEmail] = React.useState(false);
@@ -70,7 +70,7 @@ const EditProfile = () => {
     // setLoading(true);
     const form = new FormData();
     Object.keys(values).forEach(key => {
-      console.log(values.gender);
+      console.log(values);
       if (values[key]) {
         if (key === 'birthDate') {
           form.append(
@@ -94,10 +94,10 @@ const EditProfile = () => {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log(data.results.gender);
-    // setChecked(checked);
+    console.log(data.results);
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
+    console.log(profile.gender);
     setEditUsername(false);
     setEditEmail(false);
     setEditPhoneNumber(false);
@@ -239,24 +239,20 @@ const EditProfile = () => {
                 </View>
                 <View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Gender</Text>
-                  <View style={{flexDirection: 'row', gap: 30}}>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <RadioButton
-                        value="male"
-                        status={checked === 'male' ? 'checked' : 'unchecked'}
-                        onPress={() => setChecked('male')}
-                      />
-                      <Text>Male</Text>
+                  <RadioButton.Group
+                    onValueChange={handleChange('gender')}
+                    value={values.gender}>
+                    <View style={{flexDirection: 'row', gap: 30}}>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <RadioButton.Item label="Male" value="false" />
+                      </View>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <RadioButton.Item label="Female" value="true" />
+                      </View>
                     </View>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <RadioButton
-                        value="female"
-                        status={checked === 'female' ? 'checked' : 'unchecked'}
-                        onPress={() => setChecked('female')}
-                      />
-                      <Text>Female</Text>
-                    </View>
-                  </View>
+                  </RadioButton.Group>
                 </View>
                 {/*<View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Profession</Text>
