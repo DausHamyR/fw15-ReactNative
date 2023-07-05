@@ -23,7 +23,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 const EditProfile = () => {
   const [profile, setProfile] = React.useState({});
   const [text, onChangeText] = React.useState('');
-  const [checked, setChecked] = React.useState('male');
+  const [checked, setChecked] = React.useState(profile.gender ? '1' : '0');
   const token = useSelector(state => state.auth.token);
   const [editUsername, setEditUsername] = React.useState(false);
   const [editEmail, setEditEmail] = React.useState(false);
@@ -70,7 +70,7 @@ const EditProfile = () => {
     // setLoading(true);
     const form = new FormData();
     Object.keys(values).forEach(key => {
-      console.log(values);
+      console.log(values.gender);
       if (values[key]) {
         if (key === 'birthDate') {
           form.append(
@@ -85,12 +85,17 @@ const EditProfile = () => {
     if (selectedPicture) {
       form.append('picture', selectedPicture);
     }
-    console.log('masuk');
+    // console.log(checked);
+    // if (checked) {
+    //   form.append('gender', checked);
+    // }
     const {data} = await http(token).patch('/profile', form, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
+    console.log(data.results.gender);
+    // setChecked(checked);
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
     setEditUsername(false);
@@ -106,11 +111,11 @@ const EditProfile = () => {
         username: profile?.username,
         email: profile?.email,
         phoneNumber: profile?.phoneNumber,
-        // gender: profile?.gender ? 'male' : 'female',
+        gender: profile?.gender,
         // profession: profile?.profession,
         // nationality: profile?.nationality,
-        birthDate:
-          profile?.birthDate && moment(profile.birthDate).format('YYYY/MM/DD'),
+        // birthDate:
+        //   profile?.birthDate && moment(profile.birthDate).format('YYYY/MM/DD'),
       }}
       onSubmit={editProfile}
       enableReinitialize>
@@ -232,28 +237,33 @@ const EditProfile = () => {
                     )}
                   </View>
                 </View>
-                {/* <View style={{gap: 7}}>
+                <View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Gender</Text>
-                  <View style={{flexDirection: 'row', gap: 30}}>
+                  <RadioButton.Group
+                    onValueChange={handleChange('gender')}
+                    value={values.gender}
+                    style={{flexDirection: 'row', gap: 30}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <RadioButton
-                        value="male"
-                        status={checked === 'male' ? 'checked' : 'unchecked'}
-                        onPress={() => setChecked('male')}
+                      <RadioButton.Item
+                        label="0"
+                        value="0"
+                        // status={checked === '0' ? 'checked' : 'unchecked'}
+                        // onPress={() => setChecked('0')}
                       />
                       <Text>Male</Text>
                     </View>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <RadioButton
-                        value="female"
-                        status={checked === 'female' ? 'checked' : 'unchecked'}
-                        onPress={() => setChecked('female')}
+                      <RadioButton.Item
+                        label="1"
+                        value="1"
+                        // status={checked === '1' ? 'checked' : 'unchecked'}
+                        // onPress={() => setChecked('1')}
                       />
                       <Text>Female</Text>
                     </View>
-                  </View>
+                  </RadioButton.Group>
                 </View>
-                <View style={{gap: 7}}>
+                {/*<View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Profession</Text>
                   <TextInput
                     style={styles.input}
@@ -271,7 +281,7 @@ const EditProfile = () => {
                     placeholder="Full Name"
                   />
                 </View> */}
-                <View style={{gap: 7}}>
+                {/* <View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Birthday Date</Text>
                   <TouchableOpacity onPress={showDatePicker}>
                     <Input
@@ -289,7 +299,7 @@ const EditProfile = () => {
                       onCancel={hideDatePicker}
                     />
                   </TouchableOpacity>
-                </View>
+                </View> */}
                 {/* <View
                   style={{
                     borderWidth: 1,
