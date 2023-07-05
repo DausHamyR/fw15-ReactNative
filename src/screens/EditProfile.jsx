@@ -239,29 +239,24 @@ const EditProfile = () => {
                 </View>
                 <View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Gender</Text>
-                  <RadioButton.Group
-                    onValueChange={handleChange('gender')}
-                    value={values.gender}
-                    style={{flexDirection: 'row', gap: 30}}>
+                  <View style={{flexDirection: 'row', gap: 30}}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <RadioButton.Item
-                        label="0"
-                        value="0"
-                        // status={checked === '0' ? 'checked' : 'unchecked'}
-                        // onPress={() => setChecked('0')}
+                      <RadioButton
+                        value="male"
+                        status={checked === 'male' ? 'checked' : 'unchecked'}
+                        onPress={() => setChecked('male')}
                       />
                       <Text>Male</Text>
                     </View>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <RadioButton.Item
-                        label="1"
-                        value="1"
-                        // status={checked === '1' ? 'checked' : 'unchecked'}
-                        // onPress={() => setChecked('1')}
+                      <RadioButton
+                        value="female"
+                        status={checked === 'female' ? 'checked' : 'unchecked'}
+                        onPress={() => setChecked('female')}
                       />
                       <Text>Female</Text>
                     </View>
-                  </RadioButton.Group>
+                  </View>
                 </View>
                 {/*<View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Profession</Text>
