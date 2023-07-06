@@ -22,8 +22,6 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 const EditProfile = () => {
   const [profile, setProfile] = React.useState({});
-  const [text, onChangeText] = React.useState('');
-  const [checked, setChecked] = React.useState('0');
   const token = useSelector(state => state.auth.token);
   const [editUsername, setEditUsername] = React.useState(false);
   const [editEmail, setEditEmail] = React.useState(false);
@@ -70,12 +68,12 @@ const EditProfile = () => {
     // setLoading(true);
     const form = new FormData();
     Object.keys(values).forEach(key => {
-      console.log(values);
+      console.log(moment(values.birthDate).format('DD-MM-YYYY'));
       if (values[key]) {
         if (key === 'birthDate') {
           form.append(
             key,
-            moment(values[key], 'DD-MM-YYYY').format('YYYY/MM/DD'),
+            moment(values.birthDate, 'DD-MM-YYYY').format('YYYY-MM-DD'),
           );
         } else {
           form.append(key, values[key]);
@@ -85,19 +83,14 @@ const EditProfile = () => {
     if (selectedPicture) {
       form.append('picture', selectedPicture);
     }
-    // console.log(checked);
-    // if (checked) {
-    //   form.append('gender', checked);
-    // }
     const {data} = await http(token).patch('/profile', form, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log(data.results);
+    console.log(data.results.birthDate);
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
-    console.log(profile.gender);
     setEditUsername(false);
     setEditEmail(false);
     setEditPhoneNumber(false);
@@ -111,15 +104,23 @@ const EditProfile = () => {
         username: profile?.username,
         email: profile?.email,
         phoneNumber: profile?.phoneNumber,
-        gender: profile?.gender,
+        gender: profile.gender ? '1' : '0',
         // profession: profile?.profession,
         // nationality: profile?.nationality,
-        // birthDate:
-        //   profile?.birthDate && moment(profile.birthDate).format('YYYY/MM/DD'),
+        birthDate: '',
+        // profile?.birthDate && moment(profile.birthDate).format('DD/MM/YYYY'),
       }}
       onSubmit={editProfile}
       enableReinitialize>
-      {({handleSubmit, handleChange, handleBlur, errors, touched, values}) => (
+      {({
+        handleSubmit,
+        handleChange,
+        handleBlur,
+        errors,
+        touched,
+        values,
+        setFieldValue,
+      }) => (
         <ScrollView>
           {successMessage && <Alert variant="success">{successMessage}</Alert>}
           <TouchableOpacity
@@ -242,15 +243,9 @@ const EditProfile = () => {
                   <RadioButton.Group
                     onValueChange={handleChange('gender')}
                     value={values.gender}>
-                    <View style={{flexDirection: 'row', gap: 30}}>
-                      <View
-                        style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <RadioButton.Item label="Male" value="false" />
-                      </View>
-                      <View
-                        style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <RadioButton.Item label="Female" value="true" />
-                      </View>
+                    <View style={{flexDirection: 'row'}}>
+                      <RadioButton.Item label="Male" value="0" />
+                      <RadioButton.Item label="Female" value="1" />
                     </View>
                   </RadioButton.Group>
                 </View>
@@ -272,38 +267,32 @@ const EditProfile = () => {
                     placeholder="Full Name"
                   />
                 </View> */}
-                {/* <View style={{gap: 7}}>
+                <View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Birthday Date</Text>
-                  <TouchableOpacity onPress={showDatePicker}>
+                  <TouchableOpacity
+                    onPress={() => setFieldValue('birthDate', new Date())}>
                     <Input
                       style={styles.input}
-                      onChangeText={handleChange('birthDate')}
-                      onBlur={handleBlur('birthDate')}
-                      value={values.birthDate}
+                      value={
+                        values.birthDate
+                          ? values.birthDate.toISOString().slice(0, 10)
+                          : ''
+                      }
                       placeholder="Select Date"
                       editable={false}
                     />
                     <DateTimePickerModal
-                      isVisible={isDatePickerVisible}
+                      isVisible={!!values.birthDate}
                       mode="date"
-                      onConfirm={handleConfirm}
-                      onCancel={hideDatePicker}
+                      onConfirm={date => {
+                        setFieldValue('selectedDate', date);
+                        handleSubmit();
+                      }}
+                      onCancel={() => setFieldValue('selectedDate', null)}
                     />
                   </TouchableOpacity>
-                </View> */}
-                {/* <View
-                  style={{
-                    borderWidth: 1,
-                    backgroundColor: '#3366FF',
-                    height: 45,
-                    borderRadius: 7,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderColor: '#3366FF',
-                    marginVertical: 30,
-                  }}> */}
+                </View>
                 <ButtonSave onPress={handleSubmit}>SAVE</ButtonSave>
-                {/* </View> */}
               </SafeAreaView>
             </View>
           </View>
