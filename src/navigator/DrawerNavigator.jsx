@@ -30,14 +30,14 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator screenOptions={{headerShown: false}}>
       <Drawer.Screen
-        name="Home"
-        component={Home}
-        options={{drawerIcon: options => drawerIcon(options, 'home')}}
-      />
-      <Drawer.Screen
         name="Profile"
         component={Profile}
         options={{drawerIcon: options => drawerIcon(options, 'user')}}
+      />
+      <Drawer.Screen
+        name="Home"
+        component={Home}
+        options={{drawerIcon: options => drawerIcon(options, 'home')}}
       />
       <Drawer.Screen
         name="MyBooking"
