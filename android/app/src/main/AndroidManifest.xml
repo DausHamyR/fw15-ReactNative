@@ -10,8 +10,7 @@
       android:icon="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
-      android:theme="@style/AppTheme"
-      android:supportRtl="true">
+      android:theme="@style/AppTheme">
       <meta-data android:name="com.dieam.reactnativepushnotification.notification_foreground" android:value="false"/>
       <meta-data android:name="com.dieam.reactnativepushnotification.notification_color" android:resource="@android:color/white"/>
       <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" />
