@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import ButtonSave from '../components/Button';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import React from 'react';
+import React, {useRef} from 'react';
 import {RadioButton} from 'react-native-paper';
 import http from '../helpers/http';
 import {useSelector} from 'react-redux';
@@ -19,6 +19,8 @@ import {Formik} from 'formik';
 import moment from 'moment/moment';
 import Alert from '../components/Alert';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {Picker} from '@react-native-picker/picker';
+import Icon from 'react-native-vector-icons/Feather';
 
 const EditProfile = () => {
   const [profile, setProfile] = React.useState({});
@@ -29,21 +31,23 @@ const EditProfile = () => {
   const [selectedPicture, setSelectedPicture] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
   // const [loading, setLoading] = React.useState(false);
-  const [isDatePickerVisible, setDatePickerVisibility] = React.useState(false);
-  const [selectedDate, setSelectedDate] = React.useState('');
+  const [isDatePickerVisible, setDatePickerVisible] = React.useState(false);
+  // const [selectedDate, setSelectedDate] = React.useState('');
+  const [selectedProfession, setSelectedProfession] = React.useState('');
+  const [nation, setNation] = React.useState('');
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
+  // const showDatePicker = () => {
+  //   setDatePickerVisibility(true);
+  // };
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
+  // const hideDatePicker = () => {
+  //   setDatePickerVisibility(false);
+  // };
 
-  const handleConfirm = date => {
-    setSelectedDate(date.toISOString().slice(0, 10));
-    hideDatePicker();
-  };
+  // const handleConfirm = date => {
+  //   setSelectedDate(date.toISOString().slice(0, 10));
+  //   hideDatePicker();
+  // };
 
   const ImagePicker = () => {
     let options = {
@@ -52,7 +56,7 @@ const EditProfile = () => {
       },
     };
     launchImageLibrary(options, response => {
-      setSelectedPicture(response.assets[0].uri);
+      setSelectedPicture(response?.assets[0].uri);
     });
   };
 
@@ -68,7 +72,6 @@ const EditProfile = () => {
     // setLoading(true);
     const form = new FormData();
     Object.keys(values).forEach(key => {
-      console.log(moment(values.birthDate).format('DD-MM-YYYY'));
       if (values[key]) {
         if (key === 'birthDate') {
           form.append(
@@ -83,12 +86,14 @@ const EditProfile = () => {
     if (selectedPicture) {
       form.append('picture', selectedPicture);
     }
+    // console.log(values.birthDate, 'tes 1');
     const {data} = await http(token).patch('/profile', form, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log(data.results.birthDate);
+    // console.log(data.results.birthDate, 'tes 2');
+    // setSelectedDate(data.results.birthDate);
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
     setEditUsername(false);
@@ -96,6 +101,13 @@ const EditProfile = () => {
     setEditPhoneNumber(false);
     // setLoading(false);
   };
+
+  const profession = ['Fullstack Web', 'Backend Dev', 'Frontend Dev'];
+  const nationality = ['Indonesia', 'Brazil', 'Spanyol', 'Belgia'];
+
+  // React.useEffect(() => {
+  //   console.log(moment(profile.birthDate, 'YYYY-MM-DD').format('DD-MM-YYYY'));
+  // }, [profile]);
 
   return (
     <Formik
@@ -105,10 +117,9 @@ const EditProfile = () => {
         email: profile?.email,
         phoneNumber: profile?.phoneNumber,
         gender: profile.gender ? '1' : '0',
-        // profession: profile?.profession,
-        // nationality: profile?.nationality,
-        birthDate: '',
-        // profile?.birthDate && moment(profile.birthDate).format('DD/MM/YYYY'),
+        profession: profile?.profession,
+        nationality: profile?.nationality,
+        birthDate: moment(profile.birthDate, 'YYYY-MM-DD').format('DD-MM-YYYY'),
       }}
       onSubmit={editProfile}
       enableReinitialize>
@@ -249,48 +260,53 @@ const EditProfile = () => {
                     </View>
                   </RadioButton.Group>
                 </View>
-                {/*<View style={{gap: 7}}>
-                  <Text style={{fontWeight: '700'}}>Profession</Text>
-                  <TextInput
-                    style={styles.input}
-                    onChange={onChangeText}
-                    value={text}
-                    placeholder="Full Name"
-                  />
-                </View>
-                <View style={{gap: 7}}>
-                  <Text style={{fontWeight: '700'}}>Nationality</Text>
-                  <TextInput
-                    style={styles.input}
-                    onChange={onChangeText}
-                    value={text}
-                    placeholder="Full Name"
-                  />
-                </View> */}
+                {/* <ScrollView style={{marginBottom: 7}}>
+                  <Picker
+                  mode='dropdown'
+                    selectedValue={values.profession}
+                    onValueChange={handleChange('profession')}>
+                    <Picker.Item label="Java" value="java" />
+                    <Picker.Item label="JavaScript" value="js" />
+                  </Picker>
+                </ScrollView> */}
+                {/* <ScrollView style={{marginBottom: 7}}>
+                  <Picker
+                    selectedValue={values.profession}
+                    onValueChange={handleChange('profession')}>
+                    <Text style={{fontWeight: '700'}}>Nationality</Text>
+                    <Input style={styles.input} placeholder="Full Name" />
+                    <Picker.Item label="Java" value="java" />
+                    <Picker.Item label="JavaScript" value="js" />
+                  </Picker>
+                </ScrollView> */}
                 <View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Birthday Date</Text>
-                  <TouchableOpacity
-                    onPress={() => setFieldValue('birthDate', new Date())}>
-                    <Input
-                      style={styles.input}
-                      value={
-                        values.birthDate
-                          ? values.birthDate.toISOString().slice(0, 10)
-                          : ''
-                      }
-                      placeholder="Select Date"
-                      editable={false}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '115',
+                    }}>
+                    <Text>{profile.birthDate}</Text>
+                    <Icon
+                      onPress={() => setDatePickerVisible(true)}
+                      name="calendar"
+                      size={25}
+                      color="black"
                     />
-                    <DateTimePickerModal
-                      isVisible={!!values.birthDate}
-                      mode="date"
-                      onConfirm={date => {
-                        setFieldValue('selectedDate', date);
-                        handleSubmit();
-                      }}
-                      onCancel={() => setFieldValue('selectedDate', null)}
-                    />
-                  </TouchableOpacity>
+                  </View>
+                  <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    onConfirm={date => {
+                      handleChange('birthDate')(
+                        date.toISOString().slice(0, 10),
+                      );
+                      setDatePickerVisible(false);
+                    }}
+                    onCancel={() => setDatePickerVisible(false)}
+                  />
                 </View>
                 <ButtonSave onPress={handleSubmit}>SAVE</ButtonSave>
               </SafeAreaView>
