@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.demoapps"
+    namespace "net.daus.crueltyfree"
     defaultConfig {
-        applicationId "com.demoapps"
+        applicationId "net.daus.crueltyfree"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
