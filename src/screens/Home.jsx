@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {logout} from '../redux/reducers/auth';
 import Button from '../components/Button';
 import http from '../helpers/http';
+import SplashScreen from 'react-native-splash-screen';
 
 const Home = ({navigation}) => {
   const dispatch = useDispatch();
@@ -18,6 +19,10 @@ const Home = ({navigation}) => {
   React.useEffect(() => {
     saveToken();
   }, [saveToken]);
+
+  React.useEffect(() => {
+    SplashScreen.hide();
+  }, []);
 
   return (
     <View>

@@ -10,6 +10,7 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import Alert from '../components/Alert';
 import globalStyles from './assets/globalStyles';
+import SplashScreen from 'react-native-splash-screen';
 
 const validationSchema = Yup.object({
   fullName: Yup.string()
@@ -35,6 +36,10 @@ const SignUp = () => {
   const doSignUp = values => {
     dispatch(asyncSignUp(values));
   };
+
+  React.useEffect(() => {
+    SplashScreen.hide();
+  }, []);
 
   return (
     <View style={styles.wrapper}>

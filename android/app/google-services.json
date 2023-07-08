@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:678679148549:android:c04cc43b7c4db4c3d3c46c",
+        "mobilesdk_app_id": "1:678679148549:android:c349c1c703683bd8d3c46c",
         "android_client_info": {
-          "package_name": "com.demoapps"
+          "package_name": "net.daus.crueltyfree"
         }
       },
       "oauth_client": [
