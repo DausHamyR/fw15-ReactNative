@@ -123,15 +123,7 @@ const EditProfile = () => {
       }}
       onSubmit={editProfile}
       enableReinitialize>
-      {({
-        handleSubmit,
-        handleChange,
-        handleBlur,
-        errors,
-        touched,
-        values,
-        setFieldValue,
-      }) => (
+      {({handleSubmit, handleChange, handleBlur, values, setFieldValue}) => (
         <ScrollView>
           {successMessage && <Alert variant="success">{successMessage}</Alert>}
           <TouchableOpacity
