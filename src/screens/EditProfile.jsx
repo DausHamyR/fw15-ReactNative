@@ -21,6 +21,7 @@ import Alert from '../components/Alert';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {Picker} from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/Feather';
+import {date} from 'yup';
 
 const EditProfile = () => {
   const [profile, setProfile] = React.useState({});
@@ -36,18 +37,18 @@ const EditProfile = () => {
   const [selectedProfession, setSelectedProfession] = React.useState('');
   const [nation, setNation] = React.useState('');
 
-  // const showDatePicker = () => {
-  //   setDatePickerVisibility(true);
-  // };
+  const showDatePicker = () => {
+    setDatePickerVisible(true);
+  };
 
-  // const hideDatePicker = () => {
-  //   setDatePickerVisibility(false);
-  // };
+  const hideDatePicker = () => {
+    setDatePickerVisible(false);
+  };
 
-  // const handleConfirm = date => {
-  //   setSelectedDate(date.toISOString().slice(0, 10));
-  //   hideDatePicker();
-  // };
+  const handleConfirm = (date, setFieldValue) => {
+    setFieldValue('birthDate', moment(date).format('DD-MM-YYYY'));
+    hideDatePicker();
+  };
 
   const ImagePicker = () => {
     let options = {
@@ -74,10 +75,7 @@ const EditProfile = () => {
     Object.keys(values).forEach(key => {
       if (values[key]) {
         if (key === 'birthDate') {
-          form.append(
-            key,
-            moment(values.birthDate, 'DD-MM-YYYY').format('YYYY-MM-DD'),
-          );
+          form.append(key, values.birthDate);
         } else {
           form.append(key, values[key]);
         }
@@ -86,13 +84,11 @@ const EditProfile = () => {
     if (selectedPicture) {
       form.append('picture', selectedPicture);
     }
-    // console.log(values.birthDate, 'tes 1');
     const {data} = await http(token).patch('/profile', form, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    // console.log(data.results.birthDate, 'tes 2');
     // setSelectedDate(data.results.birthDate);
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
@@ -106,7 +102,7 @@ const EditProfile = () => {
   const nationality = ['Indonesia', 'Brazil', 'Spanyol', 'Belgia'];
 
   // React.useEffect(() => {
-  //   console.log(moment(profile.birthDate, 'YYYY-MM-DD').format('DD-MM-YYYY'));
+  //   console.log(moment(profile.birthDate).format('DD-MM-YYYY'), 'kentut');
   // }, [profile]);
 
   return (
@@ -119,7 +115,9 @@ const EditProfile = () => {
         gender: profile.gender ? '1' : '0',
         profession: profile?.profession,
         nationality: profile?.nationality,
-        birthDate: moment(profile.birthDate, 'YYYY-MM-DD').format('DD-MM-YYYY'),
+        birthDate: profile.birthDate
+          ? moment(profile.birthDate).format('DD-MM-YYYY')
+          : '',
       }}
       onSubmit={editProfile}
       enableReinitialize>
@@ -290,14 +288,11 @@ const EditProfile = () => {
                   </View>
                   <DateTimePickerModal
                     isVisible={isDatePickerVisible}
-                    mode="date"
-                    onConfirm={date => {
-                      handleChange('birthDate')(
-                        date.toISOString().slice(0, 10),
-                      );
-                      setDatePickerVisible(false);
-                    }}
-                    onCancel={() => setDatePickerVisible(false)}
+                    mode="birthDate"
+                    onConfirm={birthDate =>
+                      handleConfirm(birthDate, setFieldValue)
+                    }
+                    onCancel={hideDatePicker}
                   />
                 </View>
                 <ButtonSave onPress={handleSubmit}>SAVE</ButtonSave>
