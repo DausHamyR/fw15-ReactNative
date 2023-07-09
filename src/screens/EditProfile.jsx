@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import ButtonSave from '../components/Button';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import React, {useRef} from 'react';
+import React from 'react';
 import {RadioButton} from 'react-native-paper';
 import http from '../helpers/http';
 import {useSelector} from 'react-redux';
@@ -18,10 +18,9 @@ import Input from '../components/Input';
 import {Formik} from 'formik';
 import moment from 'moment/moment';
 import Alert from '../components/Alert';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {Picker} from '@react-native-picker/picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Feather';
-import {date} from 'yup';
+import SelectDropdown from 'react-native-select-dropdown';
 
 const EditProfile = () => {
   const [profile, setProfile] = React.useState({});
@@ -33,9 +32,15 @@ const EditProfile = () => {
   const [successMessage, setSuccessMessage] = React.useState('');
   // const [loading, setLoading] = React.useState(false);
   const [isDatePickerVisible, setDatePickerVisible] = React.useState(false);
-  // const [selectedDate, setSelectedDate] = React.useState('');
-  const [selectedProfession, setSelectedProfession] = React.useState('');
-  const [nation, setNation] = React.useState('');
+  const [selectedDate, setSelectedDate] = React.useState('');
+  const [selectedProfession, setSelectedProfession] = React.useState();
+  const profession = [
+    'Web developer',
+    'Backend Developer',
+    'Frontend Developer',
+    'Mobile Developer',
+  ];
+  const nationality = ['Indonesia', 'Brazil', 'Spanyol', 'Belgia'];
 
   const showDatePicker = () => {
     setDatePickerVisible(true);
@@ -65,9 +70,10 @@ const EditProfile = () => {
     const getProfile = async () => {
       const {data} = await http(token).get('/profile');
       setProfile(data.results);
+      setSelectedDate(data.results.birthDate);
     };
     getProfile();
-  }, [token]);
+  }, [token, selectedDate]);
 
   const editProfile = async values => {
     // setLoading(true);
@@ -75,7 +81,10 @@ const EditProfile = () => {
     Object.keys(values).forEach(key => {
       if (values[key]) {
         if (key === 'birthDate') {
-          form.append(key, values.birthDate);
+          form.append(
+            key,
+            moment(values.birthDate, 'DD-MM-YYYY').format('MM-DD-YYYY'),
+          );
         } else {
           form.append(key, values[key]);
         }
@@ -92,14 +101,12 @@ const EditProfile = () => {
     // setSelectedDate(data.results.birthDate);
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
+    setSelectedDate(data.results.birthDate);
     setEditUsername(false);
     setEditEmail(false);
     setEditPhoneNumber(false);
     // setLoading(false);
   };
-
-  const profession = ['Fullstack Web', 'Backend Dev', 'Frontend Dev'];
-  const nationality = ['Indonesia', 'Brazil', 'Spanyol', 'Belgia'];
 
   // React.useEffect(() => {
   //   console.log(moment(profile.birthDate).format('DD-MM-YYYY'), 'kentut');
@@ -115,9 +122,9 @@ const EditProfile = () => {
         gender: profile.gender ? '1' : '0',
         profession: profile?.profession,
         nationality: profile?.nationality,
-        birthDate: profile.birthDate
-          ? moment(profile.birthDate).format('DD-MM-YYYY')
-          : '',
+        // birthDate: profile.birthDate
+        //   ? moment(profile.birthDate).format('DD-MM-YYYY')
+        //   : '',
       }}
       onSubmit={editProfile}
       enableReinitialize>
@@ -250,25 +257,84 @@ const EditProfile = () => {
                     </View>
                   </RadioButton.Group>
                 </View>
-                {/* <ScrollView style={{marginBottom: 7}}>
-                  <Picker
-                  mode='dropdown'
-                    selectedValue={values.profession}
-                    onValueChange={handleChange('profession')}>
-                    <Picker.Item label="Java" value="java" />
-                    <Picker.Item label="JavaScript" value="js" />
-                  </Picker>
-                </ScrollView> */}
-                {/* <ScrollView style={{marginBottom: 7}}>
-                  <Picker
-                    selectedValue={values.profession}
-                    onValueChange={handleChange('profession')}>
-                    <Text style={{fontWeight: '700'}}>Nationality</Text>
-                    <Input style={styles.input} placeholder="Full Name" />
-                    <Picker.Item label="Java" value="java" />
-                    <Picker.Item label="JavaScript" value="js" />
-                  </Picker>
-                </ScrollView> */}
+                <View style={{marginBottom: 7}}>
+                  <Text style={{fontWeight: 'bold', fontSize: 15}}>
+                    Profession
+                  </Text>
+                  <SelectDropdown
+                    data={profession}
+                    onSelect={selectedItem => {
+                      handleChange('profession')(selectedItem);
+                    }}
+                    defaultValue={values.profession}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: 'gray',
+                      borderRadius: 8,
+                      padding: 10,
+                      backgroundColor: 'white',
+                      marginTop: 10,
+                    }}
+                    dropdownStyle={{
+                      borderWidth: 1,
+                      borderColor: 'gray',
+                      borderRadius: 8,
+                      marginTop: -1,
+                      backgroundColor: 'white',
+                    }}
+                    buttonStyle={{
+                      borderWidth: 1,
+                      borderColor: 'gray',
+                      borderRadius: 8,
+                      padding: 10,
+                      backgroundColor: 'white',
+                      marginTop: 10,
+                    }}
+                    textStyle={{
+                      fontSize: 16,
+                      color: 'black',
+                    }}
+                  />
+                </View>
+                <View style={{marginBottom: 7}}>
+                  <Text style={{fontWeight: 'bold', fontSize: 15}}>
+                    Nationality
+                  </Text>
+                  <SelectDropdown
+                    data={nationality}
+                    onSelect={selectedItem => {
+                      handleChange('nationality')(selectedItem);
+                    }}
+                    defaultValue={values.nationality}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: 'gray',
+                      borderRadius: 8,
+                      padding: 10,
+                      backgroundColor: 'white',
+                      marginTop: 10,
+                    }}
+                    dropdownStyle={{
+                      borderWidth: 1,
+                      borderColor: 'gray',
+                      borderRadius: 8,
+                      marginTop: -1,
+                      backgroundColor: 'white',
+                    }}
+                    buttonStyle={{
+                      borderWidth: 1,
+                      borderColor: 'gray',
+                      borderRadius: 8,
+                      padding: 10,
+                      backgroundColor: 'white',
+                      marginTop: 10,
+                    }}
+                    textStyle={{
+                      fontSize: 16,
+                      color: 'black',
+                    }}
+                  />
+                </View>
                 <View style={{gap: 7}}>
                   <Text style={{fontWeight: '700'}}>Birthday Date</Text>
                   <View
@@ -278,7 +344,7 @@ const EditProfile = () => {
                       alignItems: 'center',
                       width: '115',
                     }}>
-                    <Text>{profile.birthDate}</Text>
+                    <Text>{moment(selectedDate).format('DD-MM-YYYY')}</Text>
                     <Icon
                       onPress={() => setDatePickerVisible(true)}
                       name="calendar"
