@@ -7,6 +7,7 @@ import {
   ScrollView,
   Button,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import ButtonSave from '../components/Button';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -18,7 +19,7 @@ import Input from '../components/Input';
 import {Formik} from 'formik';
 import moment from 'moment/moment';
 import Alert from '../components/Alert';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Feather';
 import SelectDropdown from 'react-native-select-dropdown';
 
@@ -33,7 +34,6 @@ const EditProfile = () => {
   // const [loading, setLoading] = React.useState(false);
   const [isDatePickerVisible, setDatePickerVisible] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState('');
-  const [selectedProfession, setSelectedProfession] = React.useState();
   const profession = [
     'Web developer',
     'Backend Developer',
@@ -41,10 +41,6 @@ const EditProfile = () => {
     'Mobile Developer',
   ];
   const nationality = ['Indonesia', 'Brazil', 'Spanyol', 'Belgia'];
-
-  const showDatePicker = () => {
-    setDatePickerVisible(true);
-  };
 
   const hideDatePicker = () => {
     setDatePickerVisible(false);
@@ -55,15 +51,37 @@ const EditProfile = () => {
     hideDatePicker();
   };
 
-  const ImagePicker = () => {
-    let options = {
-      storageOptions: {
-        path: 'image',
-      },
-    };
-    launchImageLibrary(options, response => {
-      setSelectedPicture(response?.assets[0].uri);
-    });
+  // const ImagePicker = () => {
+  //   let options = {
+  //     storageOptions: {
+  //       path: 'image',
+  //     },
+  //   };
+  //   launchImageLibrary(options, response => {
+  //     setSelectedPicture(response?.assets[0].uri);
+  //   });
+  // };
+
+  const pickImage = async source => {
+    let results;
+    if (!source) {
+      results = await launchImageLibrary();
+    } else {
+      results = await launchCamera({
+        quality: 0.5,
+      });
+    }
+    const data = results.assets[0];
+    if (data.uri) {
+      setSelectedPicture({
+        name: data.fileName,
+        type: data.type,
+        uri:
+          Platform.OS === 'android'
+            ? data.uri
+            : data.uri.replace('file://', ''),
+      });
+    }
   };
 
   React.useEffect(() => {
@@ -98,6 +116,7 @@ const EditProfile = () => {
         'Content-Type': 'multipart/form-data',
       },
     });
+    // console.log(data.results.picture);
     // setSelectedDate(data.results.birthDate);
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
@@ -109,8 +128,10 @@ const EditProfile = () => {
   };
 
   // React.useEffect(() => {
-  //   console.log(moment(profile.birthDate).format('DD-MM-YYYY'), 'kentut');
-  // }, [profile]);
+  //   if (selectedPicture) {
+  //     console.log(selectedPicture);
+  //   }
+  // }, [selectedPicture]);
 
   return (
     <Formik
@@ -131,27 +152,46 @@ const EditProfile = () => {
       {({handleSubmit, handleChange, handleBlur, values, setFieldValue}) => (
         <ScrollView>
           {successMessage && <Alert variant="success">{successMessage}</Alert>}
-          <TouchableOpacity
-            onPress={() => {
-              ImagePicker();
-            }}
-            style={{alignSelf: 'center', marginVertical: 30}}>
-            {profile.picture === null || profile.picture === undefined ? (
-              <Image
-                style={styles.picture}
-                source={require('./assets/daw.jpg')}
-              />
+          <View
+            style={{
+              alignSelf: 'center',
+              marginVertical: 30,
+              alignItems: 'center',
+              gap: 10,
+            }}>
+            {selectedPicture ? (
+              <Image src={selectedPicture.uri} style={styles.picture} />
             ) : (
               <Image
-                style={styles.picture}
                 source={
-                  selectedPicture
-                    ? {uri: selectedPicture}
+                  profile.picture === null
+                    ? require('./assets/daw.jpg')
                     : {uri: profile.picture}
                 }
+                style={styles.picture}
               />
             )}
-          </TouchableOpacity>
+            <View style={{flexDirection: 'row', gap: 10}}>
+              <TouchableOpacity
+                onPress={() => pickImage()}
+                style={{
+                  borderWidth: 1,
+                  width: 150,
+                  borderRadius: 7,
+                }}>
+                <Text style={{textAlign: 'center'}}>Gallery</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => pickImage('camera')}
+                style={{
+                  borderWidth: 1,
+                  width: 150,
+                  borderRadius: 7,
+                }}>
+                <Text style={{textAlign: 'center'}}>Camera</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
           <View style={{marginHorizontal: 30}}>
             <View>
               <SafeAreaView style={styles.safeAreaView}>
