@@ -1,4 +1,11 @@
-import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+} from 'react-native';
 import React, {useCallback} from 'react';
 import Icon from 'react-native-vector-icons/Feather';
 import {useDispatch, useSelector} from 'react-redux';
@@ -6,8 +13,10 @@ import {logout} from '../redux/reducers/auth';
 import Button from '../components/Button';
 import http from '../helpers/http';
 import SplashScreen from 'react-native-splash-screen';
+import moment from 'moment';
 
 const Home = ({navigation}) => {
+  const [event, setEvent] = React.useState();
   const dispatch = useDispatch();
   const deviceToken = useSelector(state => state.deviceToken.data);
   const token = useSelector(state => state.auth.token);
@@ -15,6 +24,28 @@ const Home = ({navigation}) => {
     const form = new URLSearchParams({token: deviceToken.token});
     await http(token).post('/device-token', form.toString());
   }, [deviceToken, token]);
+
+  // const getEvent = React.useCallback(async () => {
+  //   const {data} = await http(token).get('/events');
+  //   setEvent(data.results);
+  // }, [token]);
+
+  React.useEffect(() => {
+    const getEvent = async () => {
+      try {
+        const {data} = await http(token).get('/events');
+        setEvent(data.results);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getEvent();
+  }, [token]);
+
+  // React.useEffect(() => {
+  //   getEvent();
+  //   console.log(event);
+  // }, [getEvent, event]);
 
   React.useEffect(() => {
     saveToken();
@@ -55,12 +86,10 @@ const Home = ({navigation}) => {
             <View style={styles.titikDateYellow} />
           </View>
         </View>
-        <TouchableOpacity onPress={() => dispatch(logout())}>
-          <View style={styles.wrapperDate}>
-            <Text style={styles.textDate}>16</Text>
-            <Text style={styles.textDate}>Thu</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.wrapperDate}>
+          <Text style={styles.textDate}>16</Text>
+          <Text style={styles.textDate}>Thu</Text>
+        </View>
         <TouchableOpacity onPress={() => navigation.navigate('ManageEvent')}>
           <View style={styles.wrapperDate}>
             <Text style={styles.textDate}>17</Text>
@@ -90,41 +119,54 @@ const Home = ({navigation}) => {
             style={{width: 70, height: 70}}
           />
         </View>
-        <View style={{alignItems: 'center'}}>
-          <TouchableOpacity onPress={() => navigation.navigate('EventDetail')}>
-            <Image
-              source={require('./assets/Bitmap.png')}
-              style={{minWidth: 100, height: 350, borderRadius: 30}}
-            />
-          </TouchableOpacity>
-          <View
-            style={{
-              position: 'relative',
-              top: -200,
-              minWidth: 270,
-              gap: 20,
-            }}>
-            <Text style={{color: 'white', fontWeight: '700'}}>
-              Wed, 15 Nov, 4:00 PM
-            </Text>
-            <Text
-              style={{
-                color: 'white',
-                fontWeight: '700',
-                fontSize: 23,
-                width: 200,
-                lineHeight: 30,
-              }}>
-              Sights & Sounds Exhibition
-            </Text>
-            <Image
-              source={require('./assets/Primary.png')}
-              style={{minWidth: 50, height: 50}}
-            />
-          </View>
-        </View>
+        <FlatList
+          data={event}
+          keyExtractor={item => item.id}
+          renderItem={({item}) => (
+            <View style={{alignItems: 'center', gap: 30}}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('EventDetail', item.id)}>
+                <Image
+                  source={{uri: item.picture}}
+                  style={{
+                    minWidth: 300,
+                    height: 350,
+                    borderRadius: 20,
+                    marginHorizontal: 10,
+                  }}
+                />
+              </TouchableOpacity>
+              <View
+                style={{
+                  position: 'relative',
+                  top: -220,
+                  minWidth: 270,
+                  gap: 20,
+                }}>
+                <Text
+                  style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                  {moment(item.date, 'YYYY-MM-DD').format('DD-MM-YYYY')}
+                </Text>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: 25,
+                    width: 200,
+                    lineHeight: 30,
+                  }}>
+                  {item.title}
+                </Text>
+                <Image
+                  source={require('./assets/Primary.png')}
+                  style={{minWidth: 50, height: 50}}
+                />
+              </View>
+            </View>
+          )}
+          horizontal={true}
+        />
       </View>
-      <Button onPress={() => dispatch(logout())}>Logout</Button>
     </View>
   );
 };

@@ -5,6 +5,7 @@ import http from '../helpers/http';
 import {useSelector} from 'react-redux';
 
 const Profile = () => {
+  const getProfile = useSelector(state => state.profile.data);
   const token = useSelector(state => state.auth.token);
   const [profile, setProfile] = React.useState({});
   const navigation = useNavigation();
@@ -15,6 +16,13 @@ const Profile = () => {
     };
     getProfile();
   }, [token, profile.picture]);
+
+  React.useEffect(() => {
+    if (getProfile) {
+      setProfile(getProfile);
+    }
+  }, [getProfile]);
+
   return (
     <View>
       <View
