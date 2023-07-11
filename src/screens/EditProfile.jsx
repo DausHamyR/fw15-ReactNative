@@ -14,7 +14,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import React from 'react';
 import {RadioButton} from 'react-native-paper';
 import http from '../helpers/http';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import Input from '../components/Input';
 import {Formik} from 'formik';
 import moment from 'moment/moment';
@@ -22,8 +22,10 @@ import Alert from '../components/Alert';
 import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Feather';
 import SelectDropdown from 'react-native-select-dropdown';
+import {dataProfile} from '../redux/reducers/profile';
 
 const EditProfile = () => {
+  const dispatch = useDispatch();
   const [profile, setProfile] = React.useState({});
   const token = useSelector(state => state.auth.token);
   const [editUsername, setEditUsername] = React.useState(false);
@@ -118,6 +120,8 @@ const EditProfile = () => {
     });
     // console.log(data.results.picture);
     // setSelectedDate(data.results.birthDate);
+    const a = dispatch(dataProfile(data.results));
+    console.log(a);
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
     setSelectedDate(data.results.birthDate);
@@ -159,17 +163,15 @@ const EditProfile = () => {
               alignItems: 'center',
               gap: 10,
             }}>
-            {selectedPicture ? (
-              <Image src={selectedPicture.uri} style={styles.picture} />
-            ) : (
+            {profile.picture === null ? (
               <Image
-                source={
-                  profile.picture === null
-                    ? require('./assets/daw.jpg')
-                    : {uri: profile.picture}
-                }
+                source={require('./assets/daw.jpg')}
                 style={styles.picture}
               />
+            ) : selectedPicture ? (
+              <Image src={selectedPicture.uri} style={styles.picture} />
+            ) : (
+              <Image source={{uri: profile.picture}} style={styles.picture} />
             )}
             <View style={{flexDirection: 'row', gap: 10}}>
               <TouchableOpacity

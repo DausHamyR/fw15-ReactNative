@@ -1,22 +1,15 @@
 const {createSlice} = require('@reduxjs/toolkit');
 
 const initialState = {
-  picture: '',
-  username: '',
-  email: '',
-  phoneNumber: '',
-  gender: '',
-  profession: '',
-  nationality: '',
-  birthDate: '',
+  data: '',
 };
 
 const profile = createSlice({
   name: 'profile',
   initialState,
   reducers: {
-    getProfile: (state, action) => {
-      state.token = action.payload;
+    dataProfile: (state, action) => {
+      state.data = action.payload;
     },
     removeProfile: () => {
       return initialState;
@@ -24,5 +17,5 @@ const profile = createSlice({
   },
 });
 
-export const {getProfile, removeProfile} = profile.actions;
+export const {dataProfile, removeProfile} = profile.actions;
 export default profile.reducer;
