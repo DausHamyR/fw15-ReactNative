@@ -120,8 +120,7 @@ const EditProfile = () => {
     });
     // console.log(data.results.picture);
     // setSelectedDate(data.results.birthDate);
-    const a = dispatch(dataProfile(data.results));
-    console.log(a);
+    dispatch(dataProfile(data.results));
     setSuccessMessage('Profile updated successfully');
     setProfile(data.results);
     setSelectedDate(data.results.birthDate);

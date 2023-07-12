@@ -125,7 +125,9 @@ const Home = ({navigation}) => {
           renderItem={({item}) => (
             <View style={{alignItems: 'center', gap: 30}}>
               <TouchableOpacity
-                onPress={() => navigation.navigate('EventDetail', item.id)}>
+                onPress={() =>
+                  navigation.navigate('EventDetail', {id: item.id})
+                }>
                 <Image
                   source={{uri: item.picture}}
                   style={{

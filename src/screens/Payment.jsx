@@ -1,9 +1,33 @@
-import {View, Text, Image} from 'react-native';
+import {View, Text, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {RadioButton} from 'react-native-paper';
+import {useDispatch, useSelector} from 'react-redux';
+import http from '../helpers/http';
+import {dataPayment} from '../redux/reducers/payment';
+import {useNavigation} from '@react-navigation/native';
 
 const Payment = () => {
-  const [checked, setChecked] = React.useState('first');
+  const dispatch = useDispatch();
+  const [checked, setChecked] = React.useState('1');
+  const getReservation = useSelector(state => state.sectionPrice.data);
+  const token = useSelector(state => state.auth.token);
+  const navigation = useNavigation();
+
+  React.useEffect(() => {
+    getReservation;
+  }, [getReservation]);
+
+  const postPayment = async () => {
+    const form = new URLSearchParams({
+      reservationId: getReservation.reservationId,
+      paymentMethodId: checked,
+    }).toString();
+    const {data} = await http(token).post('/payment', form);
+    if (data) {
+      dispatch(dataPayment(data.results));
+      navigation.navigate('MyBooking');
+    }
+  };
 
   return (
     <View>
@@ -19,9 +43,9 @@ const Payment = () => {
           }}>
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 5}}>
             <RadioButton
-              value="first"
-              status={checked === 'first' ? 'checked' : 'unchecked'}
-              onPress={() => setChecked('first')}
+              value="1"
+              status={checked === '1' ? 'checked' : 'unchecked'}
+              onPress={() => setChecked('1')}
             />
             <Image
               source={require('./assets/Group810.png')}
@@ -46,9 +70,9 @@ const Payment = () => {
             }}>
             <View style={{flexDirection: 'row', alignItems: 'center', gap: 5}}>
               <RadioButton
-                value="bank-transfer"
-                status={checked === 'bank-transfer' ? 'checked' : 'unchecked'}
-                onPress={() => setChecked('bank-transfer')}
+                value="2"
+                status={checked === '2' ? 'checked' : 'unchecked'}
+                onPress={() => setChecked('2')}
               />
               <Image source={require('./assets/Group811.png')} />
               <Text style={{fontWeight: '700', fontSize: 17, marginLeft: 6}}>
@@ -65,9 +89,9 @@ const Payment = () => {
             }}>
             <View style={{flexDirection: 'row', alignItems: 'center', gap: 5}}>
               <RadioButton
-                value="retail"
-                status={checked === 'retail' ? 'checked' : 'unchecked'}
-                onPress={() => setChecked('retail')}
+                value="3"
+                status={checked === '3' ? 'checked' : 'unchecked'}
+                onPress={() => setChecked('3')}
               />
               <Image source={require('./assets/Group826.png')} />
               <Text style={{fontWeight: '700', fontSize: 17, marginLeft: 6}}>
@@ -84,9 +108,9 @@ const Payment = () => {
             }}>
             <View style={{flexDirection: 'row', alignItems: 'center', gap: 5}}>
               <RadioButton
-                value="e-money"
-                status={checked === 'e-money' ? 'checked' : 'unchecked'}
-                onPress={() => setChecked('e-money')}
+                value="4"
+                status={checked === '4' ? 'checked' : 'unchecked'}
+                onPress={() => setChecked('4')}
               />
               <Image source={require('./assets/Group830.png')} />
               <Text style={{fontWeight: '700', fontSize: 17, marginLeft: 6}}>
@@ -105,7 +129,7 @@ const Payment = () => {
           <View>
             <Text style={{fontWeight: '800', fontSize: 17}}>Total Payment</Text>
             <Text style={{fontSize: 17, color: '#3366FF', fontWeight: '800'}}>
-              $70
+              {getReservation.totalPayment}
             </Text>
           </View>
           <View
@@ -117,9 +141,11 @@ const Payment = () => {
               alignItems: 'center',
               borderRadius: 10,
             }}>
-            <Text style={{color: 'white', fontWeight: '600', fontSize: 16}}>
-              Payment
-            </Text>
+            <TouchableOpacity onPress={() => postPayment()}>
+              <Text style={{color: 'white', fontWeight: '600', fontSize: 16}}>
+                Payment
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

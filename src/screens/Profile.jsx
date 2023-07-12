@@ -10,11 +10,11 @@ const Profile = () => {
   const [profile, setProfile] = React.useState({});
   const navigation = useNavigation();
   React.useEffect(() => {
-    const getProfile = async () => {
+    const getProfilee = async () => {
       const {data} = await http(token).get('/profile');
       setProfile(data.results);
     };
-    getProfile();
+    getProfilee();
   }, [token, profile.picture]);
 
   React.useEffect(() => {
