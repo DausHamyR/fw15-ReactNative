@@ -4,6 +4,7 @@ import {persistReducer} from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import deviceToken from './deviceToken';
 import profile from './profile';
+import sectionPrice from './sectionPrice';
 
 const authConfig = {
   key: 'auth',
@@ -14,6 +15,7 @@ const reducer = combineReducers({
   auth: persistReducer(authConfig, auth),
   deviceToken: deviceToken,
   profile: profile,
+  sectionPrice: sectionPrice,
 });
 
 export default reducer;
