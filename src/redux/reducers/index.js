@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import deviceToken from './deviceToken';
 import profile from './profile';
 import sectionPrice from './sectionPrice';
+import payment from './payment';
 
 const authConfig = {
   key: 'auth',
@@ -16,6 +17,7 @@ const reducer = combineReducers({
   deviceToken: deviceToken,
   profile: profile,
   sectionPrice: sectionPrice,
+  payment: payment,
 });
 
 export default reducer;

@@ -4,6 +4,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import http from '../helpers/http';
 import {useSelector} from 'react-redux';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/Feather';
 
 const EventDetail = () => {
   const navigation = useNavigation();
@@ -11,6 +12,36 @@ const EventDetail = () => {
   const token = useSelector(state => state.auth.token);
   const [event, setEvent] = React.useState({});
   const {id} = route.params;
+  const [wishlist, setWishlist] = React.useState(false);
+
+  async function postWishlist(id) {
+    try {
+      if (wishlist) {
+        await http(token).delete(`/wishlists/${id}`);
+        setWishlist(false);
+      } else {
+        const body = new URLSearchParams({
+          eventId: id,
+        }).toString();
+        await http(token).post('/wishlists', body);
+        setWishlist(true);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  React.useEffect(() => {
+    async function getWishlist(id) {
+      const {data} = await http(token).get(`/wishlists/${id}`);
+      if (!data) {
+        setWishlist(false);
+      } else {
+        setWishlist(true);
+      }
+    }
+    getWishlist(id);
+  }, [token, id]);
 
   React.useEffect(() => {
     const getEvent = async id => {
@@ -33,26 +64,57 @@ const EventDetail = () => {
       <View
         style={{
           position: 'absolute',
-          width: '60%',
+          width: '90%',
           height: '60%',
-          marginLeft: 40,
+          marginLeft: 20,
           marginTop: 40,
           flexDirection: 'column',
           justifyContent: 'start',
           gap: 35,
         }}>
-        <Text style={{color: 'white', fontSize: 30, fontWeight: '500'}}>
-          {event.title}
-        </Text>
-        <View style={{gap: 15}}>
-          <Text style={{color: 'white', fontWeight: '500'}}>
-            {event.location}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'start',
+            justifyContent: 'space-between',
+          }}>
+          <Text style={{color: 'white', fontSize: 35, fontWeight: 'bold'}}>
+            {event.title}
           </Text>
-          <Text style={{color: 'white', fontWeight: '500'}}>
-            {moment(event.date, 'YYYY-MM-DD').format('DD-MM-YYYY')}
-          </Text>
+          <TouchableOpacity onPress={() => postWishlist(event.id)}>
+            <Icon name="heart" size={35} color={!wishlist ? 'white' : 'red'} />
+          </TouchableOpacity>
         </View>
-        <Text style={{color: 'white', fontWeight: '500'}}>Attendees</Text>
+        <View style={{gap: 15}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+            }}>
+            <Icon name="map-pin" size={25} color="blue" width="30" />
+            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20}}>
+              {event.location}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+            }}>
+            <Icon name="clock" size={25} color="blue" width="30" />
+            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20}}>
+              {moment(event.date, 'YYYY-MM-DD').format('DD-MM-YYYY')}
+            </Text>
+          </View>
+        </View>
+        <View style={{gap: 5}}>
+          <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20}}>
+            Attendees
+          </Text>
+          <Image source={require('./assets/atten.png')} />
+        </View>
       </View>
       <View
         style={{

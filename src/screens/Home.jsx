@@ -8,16 +8,13 @@ import {
 } from 'react-native';
 import React, {useCallback} from 'react';
 import Icon from 'react-native-vector-icons/Feather';
-import {useDispatch, useSelector} from 'react-redux';
-import {logout} from '../redux/reducers/auth';
-import Button from '../components/Button';
+import {useSelector} from 'react-redux';
 import http from '../helpers/http';
 import SplashScreen from 'react-native-splash-screen';
 import moment from 'moment';
 
 const Home = ({navigation}) => {
   const [event, setEvent] = React.useState();
-  const dispatch = useDispatch();
   const deviceToken = useSelector(state => state.deviceToken.data);
   const token = useSelector(state => state.auth.token);
   const saveToken = useCallback(async () => {
