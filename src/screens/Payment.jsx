@@ -8,10 +8,10 @@ import {useNavigation} from '@react-navigation/native';
 
 const Payment = () => {
   const dispatch = useDispatch();
-  const [checked, setChecked] = React.useState('1');
   const getReservation = useSelector(state => state.sectionPrice.data);
   const token = useSelector(state => state.auth.token);
   const navigation = useNavigation();
+  const [checked, setChecked] = React.useState('1');
 
   React.useEffect(() => {
     getReservation;
