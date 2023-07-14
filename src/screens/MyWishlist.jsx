@@ -20,9 +20,9 @@ const MyWishlist = () => {
     }
   }
 
-  React.useEffect(() => {
-    deleteWishlist;
-  }, [deleteWishlist]);
+  // React.useEffect(() => {
+  //   deleteWishlist;
+  // }, [deleteWishlist]);
 
   React.useEffect(() => {
     const getWishlist = async () => {

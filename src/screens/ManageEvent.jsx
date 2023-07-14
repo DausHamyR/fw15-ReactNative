@@ -1,5 +1,5 @@
 import {View, Text, TouchableOpacity, FlatList} from 'react-native';
-import React from 'react';
+import React, {useCallback} from 'react';
 import http from '../helpers/http';
 import {useSelector} from 'react-redux';
 import Modal from 'react-native-modal';
@@ -8,7 +8,9 @@ import moment from 'moment';
 const ManageEvent = () => {
   const token = useSelector(state => state.auth.token);
   const [getManageEvent, setGetManageEvent] = React.useState();
+  const [detailManageEvent, setDetailManageEvent] = React.useState();
   const [isModalVisible, setModalVisible] = React.useState(false);
+  const [deleteEvent, setDeleteEvent] = React.useState(false);
 
   async function postCreateEvent() {
     try {
@@ -30,6 +32,32 @@ const ManageEvent = () => {
     manageEvent();
   }, [token, getManageEvent]);
 
+  React.useEffect(() => {
+    getDetailManageEvent();
+  }, [getDetailManageEvent]);
+
+  const getDetailManageEvent = useCallback(
+    async id => {
+      try {
+        const {data} = await http(token).get(`/events/manage/${id}`);
+        setDetailManageEvent(data.results);
+        setModalVisible(true);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [token],
+  );
+
+  async function removeEvent(id) {
+    try {
+      await http(token).delete(`/events/manage${id}`);
+      setDeleteEvent(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <View style={{backgroundColor: 'white', height: '100%'}}>
       <View
@@ -47,7 +75,7 @@ const ManageEvent = () => {
           <Text style={{color: '#3366FF', fontWeight: '500'}}>Create</Text>
         </TouchableOpacity>
       </View>
-      <View style={{}}>
+      <View>
         <FlatList
           data={getManageEvent}
           keyExtractor={item => item.id}
@@ -77,23 +105,41 @@ const ManageEvent = () => {
               </View>
               <View style={{gap: 10}}>
                 <Text
-                  style={{fontWeight: 'bold', fontSize: 17, lineHeight: 35}}>
+                  style={{fontWeight: 'bold', fontSize: 20, lineHeight: 35}}>
                   {item.title}
                 </Text>
-                <View>
+                <View style={{gap: 5}}>
                   <Text>{moment(item.date).format('DD-MM-YYYY')}</Text>
                   <Text>{item.name}</Text>
-                  {/* <TouchableOpacity onPress={() => getDetailHistory(item.id)}>
-                    <Text style={{color: 'blue', fontWeight: '600'}}>
-                      Detail
-                    </Text>
-                  </TouchableOpacity> */}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      gap: 25,
+                      alignItems: 'center',
+                    }}>
+                    <TouchableOpacity
+                      onPress={() => getDetailManageEvent(item.id)}>
+                      <Text style={{color: 'blue', fontWeight: '600'}}>
+                        Detail
+                      </Text>
+                    </TouchableOpacity>
+                    {/* <TouchableOpacity onPress={() => getDetailHistory(item.id)}>
+                      <Text style={{color: 'blue', fontWeight: '600'}}>
+                        update
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => removeEvent(item.id)}>
+                      <Text style={{color: 'blue', fontWeight: '600'}}>
+                        Delete
+                      </Text>
+                    </TouchableOpacity> */}
+                  </View>
                 </View>
               </View>
             </View>
           )}
         />
-        {/* <Modal isVisible={isModalVisible}>
+        <Modal isVisible={isModalVisible}>
           <View
             style={{
               backgroundColor: 'white',
@@ -102,20 +148,21 @@ const ManageEvent = () => {
             }}>
             <View style={{marginHorizontal: 20, gap: 20}}>
               <Text style={{fontWeight: 'bold', fontSize: 18}}>
-                History Payment
+                Detail Manage Event
               </Text>
               <View style={{gap: 5}}>
                 <Text style={{fontWeight: '700', fontSize: 14}}>
-                  Event Name : {detailHistory.title}
+                  Event Name : {detailManageEvent?.title}
                 </Text>
                 <Text style={{fontWeight: '700', fontSize: 14}}>
-                  Event Date : {moment(detailHistory.date).format('DD-MM-YYYY')}
+                  Event Date :
+                  {moment(detailManageEvent?.date).format('DD-MM-YYYY')}
                 </Text>
                 <Text style={{fontWeight: '700', fontSize: 14}}>
-                  Payment Status : {detailHistory.name}
+                  Location Event : {detailManageEvent?.name}
                 </Text>
                 <Text style={{fontWeight: '700', fontSize: 14}}>
-                  Payment Method : {detailHistory.namePayment}
+                  Descriptions Event : {detailManageEvent?.descriptions}
                 </Text>
               </View>
               <View
@@ -140,7 +187,7 @@ const ManageEvent = () => {
               </View>
             </View>
           </View>
-        </Modal> */}
+        </Modal>
       </View>
     </View>
   );
