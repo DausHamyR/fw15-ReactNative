@@ -1,20 +1,35 @@
-import {View, Text, TouchableOpacity, FlatList} from 'react-native';
+import {View, Text, TouchableOpacity, FlatList, Platform} from 'react-native';
 import React, {useCallback} from 'react';
 import http from '../helpers/http';
 import {useSelector} from 'react-redux';
 import Modal from 'react-native-modal';
 import moment from 'moment';
+import Input from '../components/Input';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 const ManageEvent = () => {
   const token = useSelector(state => state.auth.token);
   const [getManageEvent, setGetManageEvent] = React.useState();
   const [detailManageEvent, setDetailManageEvent] = React.useState();
   const [isModalVisible, setModalVisible] = React.useState(false);
+  const [modalCreateEvent, setModalCreateEvent] = React.useState(false);
   const [deleteEvent, setDeleteEvent] = React.useState(false);
+  const [selectedPicture, setSelectedPicture] = React.useState('');
+
+  async function removeEvent(id) {
+    try {
+      console.log(id);
+      await http(token).delete(`/events/manage/${id}`);
+      setDeleteEvent(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   async function postCreateEvent() {
     try {
       await http(token).post('/events/manage');
+      setModalCreateEvent(true);
     } catch (err) {
       console.log(err);
     }
@@ -34,7 +49,8 @@ const ManageEvent = () => {
 
   React.useEffect(() => {
     getDetailManageEvent();
-  }, [getDetailManageEvent]);
+    console.log(selectedPicture);
+  }, [getDetailManageEvent, selectedPicture]);
 
   const getDetailManageEvent = useCallback(
     async id => {
@@ -49,14 +65,21 @@ const ManageEvent = () => {
     [token],
   );
 
-  async function removeEvent(id) {
-    try {
-      await http(token).delete(`/events/manage${id}`);
-      setDeleteEvent(false);
-    } catch (err) {
-      console.log(err);
+  const pickImage = async source => {
+    let results;
+    results = await launchImageLibrary();
+    const data = results.assets[0];
+    if (data.uri) {
+      setSelectedPicture({
+        name: data.fileName,
+        type: data.type,
+        uri:
+          Platform.OS === 'android'
+            ? data.uri
+            : data.uri.replace('file://', ''),
+      });
     }
-  }
+  };
 
   return (
     <View style={{backgroundColor: 'white', height: '100%'}}>
@@ -127,12 +150,12 @@ const ManageEvent = () => {
                       <Text style={{color: 'blue', fontWeight: '600'}}>
                         update
                       </Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                     <TouchableOpacity onPress={() => removeEvent(item.id)}>
                       <Text style={{color: 'blue', fontWeight: '600'}}>
                         Delete
                       </Text>
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -173,6 +196,67 @@ const ManageEvent = () => {
                   backgroundColor: 'red',
                 }}>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      paddingHorizontal: 10,
+                      paddingVertical: 10,
+                      color: 'white',
+                      fontWeight: 'bold',
+                    }}>
+                    Close
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <Modal isVisible={modalCreateEvent}>
+          <View
+            style={{
+              backgroundColor: 'white',
+              paddingVertical: 30,
+              borderRadius: 15,
+            }}>
+            <View style={{marginHorizontal: 20, gap: 20}}>
+              <Text style={{fontWeight: 'bold', fontSize: 18}}>
+                Create Manage Event
+              </Text>
+              <View style={{gap: 5}}>
+                <Text style={{fontWeight: '700', fontSize: 14}}>
+                  Event Name : {detailManageEvent?.title}
+                </Text>
+                <Input />
+                <Text style={{fontWeight: '700', fontSize: 14}}>
+                  Event Date :
+                  {moment(detailManageEvent?.date).format('DD-MM-YYYY')}
+                </Text>
+                <Input />
+                <Text style={{fontWeight: '700', fontSize: 14}}>
+                  Location Event : {detailManageEvent?.name}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => pickImage()}
+                  style={{
+                    borderWidth: 1,
+                    width: 150,
+                    borderRadius: 7,
+                  }}>
+                  <Text style={{textAlign: 'center'}}>Gallery</Text>
+                </TouchableOpacity>
+                <Text style={{fontWeight: '700', fontSize: 14}}>
+                  Descriptions Event : {detailManageEvent?.descriptions}
+                </Text>
+                <Input />
+              </View>
+              <View
+                style={{
+                  borderWidth: 1,
+                  alignSelf: 'flex-end',
+                  borderRadius: 10,
+                  backgroundColor: 'red',
+                }}>
+                <TouchableOpacity onPress={() => setModalCreateEvent(false)}>
                   <Text
                     style={{
                       textAlign: 'center',
