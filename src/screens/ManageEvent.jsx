@@ -26,7 +26,6 @@ const ManageEvent = () => {
   const [modalCreateEvent, setModalCreateEvent] = React.useState(false);
   const [selectedPicture, setSelectedPicture] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
-  // const [selectedDate, setSelectedDate] = React.useState('');
 
   async function removeEvent(id) {
     try {
@@ -42,7 +41,6 @@ const ManageEvent = () => {
       try {
         const {data} = await http(token).get('/events/manage');
         setGetManageEvent(data.results);
-        // setSelectedDate(data.results.date);
       } catch (err) {
         console.log(err);
       }
@@ -63,7 +61,7 @@ const ManageEvent = () => {
     [token],
   );
 
-  const pickImage = async source => {
+  const pickImage = async () => {
     let results;
     results = await launchImageLibrary();
     const data = results.assets[0];
@@ -154,7 +152,6 @@ const ManageEvent = () => {
     if (selectedPicture) {
       form.append('picture', selectedPicture);
     }
-    console.log(values, 'ad');
     console.log(form, 'form');
     const {data} = await http(token).post('/events/manage', form, {
       headers: {
@@ -162,17 +159,9 @@ const ManageEvent = () => {
       },
     });
     console.log(data.results);
-    // console.log(data.results.picture);
-    // setSelectedDate(data.results.birthDate);
-    // dispatch(dataProfile(data.results));
     setGetManageEvent(data.results);
-    // setSelectedDate(data.results.birthDate);
     setModalCreateEvent(false);
     setSuccessMessage('Create Events successfully');
-    // setEditEmail(false);
-    // setEditPhoneNumber(false);
-    // setLoading(false);
-    // setSelectedDate(data.results.date);
   };
 
   return (
@@ -324,7 +313,6 @@ const ManageEvent = () => {
                   price: '',
                   category: '',
                   date: '',
-                  picture: '',
                   detail: '',
                 }}
                 onSubmit={btnCreateEvent}
