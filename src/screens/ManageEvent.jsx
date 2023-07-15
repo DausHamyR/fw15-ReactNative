@@ -18,15 +18,15 @@ const ManageEvent = () => {
   const [getManageEvent, setGetManageEvent] = React.useState();
   const [isDatePickerVisible, setDatePickerVisible] = React.useState(false);
   const [getCity, setGetCity] = React.useState();
-  const [getPrice, setGetPrice] = React.useState();
   const [getSections, setGetSections] = React.useState();
   const [getCategories, setGetCategories] = React.useState();
   const [detailManageEvent, setDetailManageEvent] = React.useState({});
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [modalCreateEvent, setModalCreateEvent] = React.useState(false);
+  const [modalUpdateEvent, setmodalUpdateEvent] = React.useState(false);
   const [selectedPicture, setSelectedPicture] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
-  // const [selectedDate, setSelectedDate] = React.useState('');
+  const [idEvent, setIdEvent] = React.useState();
 
   async function removeEvent(id) {
     try {
@@ -42,7 +42,6 @@ const ManageEvent = () => {
       try {
         const {data} = await http(token).get('/events/manage');
         setGetManageEvent(data.results);
-        // setSelectedDate(data.results.date);
       } catch (err) {
         console.log(err);
       }
@@ -63,7 +62,12 @@ const ManageEvent = () => {
     [token],
   );
 
-  const pickImage = async source => {
+  const updateEvent = async id => {
+    setIdEvent(id);
+    setmodalUpdateEvent(true);
+  };
+
+  const pickImage = async () => {
     let results;
     results = await launchImageLibrary();
     const data = results.assets[0];
@@ -86,8 +90,6 @@ const ManageEvent = () => {
         const mapSections = data.results.map(
           dataSections => dataSections.price,
         );
-        const mapPrice = data.results.map(dataPrice => dataPrice.name);
-        setGetPrice(mapPrice);
         setGetSections(mapSections);
       } catch (err) {
         console.log(err);
@@ -154,7 +156,6 @@ const ManageEvent = () => {
     if (selectedPicture) {
       form.append('picture', selectedPicture);
     }
-    console.log(values, 'ad');
     console.log(form, 'form');
     const {data} = await http(token).post('/events/manage', form, {
       headers: {
@@ -162,17 +163,43 @@ const ManageEvent = () => {
       },
     });
     console.log(data.results);
-    // console.log(data.results.picture);
-    // setSelectedDate(data.results.birthDate);
-    // dispatch(dataProfile(data.results));
     setGetManageEvent(data.results);
-    // setSelectedDate(data.results.birthDate);
     setModalCreateEvent(false);
     setSuccessMessage('Create Events successfully');
-    // setEditEmail(false);
-    // setEditPhoneNumber(false);
-    // setLoading(false);
-    // setSelectedDate(data.results.date);
+  };
+
+  const btnUpdateEvent = async values => {
+    // setLoading(true);
+    const form = new FormData();
+    Object.keys(values).forEach(key => {
+      if (values[key]) {
+        if (key === 'price') {
+          const priceId = (values.price = 2);
+          form.append('price', priceId);
+        } else if (key === 'location') {
+          const cityId = (values.location = 2);
+          form.append('location', cityId);
+        } else if (key === 'category') {
+          const categoryId = (values.category = 2);
+          form.append('category', categoryId);
+        } else {
+          form.append(key, values[key]);
+        }
+      }
+    });
+    if (selectedPicture) {
+      form.append('picture', selectedPicture);
+    }
+    console.log(form, 'form');
+    const {data} = await http(token).patch(`/events/manage/${idEvent}`, form, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    console.log(data.results);
+    setGetManageEvent(data.results);
+    setmodalUpdateEvent(false);
+    setSuccessMessage('Update Events successfully');
   };
 
   return (
@@ -237,15 +264,15 @@ const ManageEvent = () => {
                     }}>
                     <TouchableOpacity
                       onPress={() => getDetailManageEvent(item.id)}>
-                      <Text style={{color: 'blue', fontWeight: '600'}}>
+                      <Text style={{color: 'green', fontWeight: '600'}}>
                         Detail
                       </Text>
                     </TouchableOpacity>
-                    {/* <TouchableOpacity onPress={() => getDetailHistory(item.id)}>
+                    <TouchableOpacity onPress={() => updateEvent(item.id)}>
                       <Text style={{color: 'blue', fontWeight: '600'}}>
                         update
                       </Text>
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => removeEvent(item.id)}>
                       <Text style={{color: 'red', fontWeight: '600'}}>
                         Delete
@@ -324,7 +351,6 @@ const ManageEvent = () => {
                   price: '',
                   category: '',
                   date: '',
-                  picture: '',
                   detail: '',
                 }}
                 onSubmit={btnCreateEvent}
@@ -479,6 +505,197 @@ const ManageEvent = () => {
                         }}>
                         <TouchableOpacity
                           onPress={() => setModalCreateEvent(false)}>
+                          <Text
+                            style={{
+                              textAlign: 'center',
+                              paddingHorizontal: 10,
+                              paddingVertical: 10,
+                              color: 'white',
+                              fontWeight: 'bold',
+                            }}>
+                            Close
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </>
+                )}
+              </Formik>
+            </View>
+          </View>
+        </Modal>
+        <Modal isVisible={modalUpdateEvent}>
+          <View
+            style={{
+              backgroundColor: 'white',
+              paddingVertical: 30,
+              borderRadius: 15,
+            }}>
+            <View style={{marginHorizontal: 20, gap: 20}}>
+              <Text style={{fontWeight: 'bold', fontSize: 18}}>
+                Update Manage Event
+              </Text>
+              <Formik
+                initialValues={{
+                  name: '',
+                  location: '',
+                  price: '',
+                  category: '',
+                  date: '',
+                  detail: '',
+                }}
+                onSubmit={btnUpdateEvent}
+                enableReinitialize>
+                {({
+                  handleSubmit,
+                  handleChange,
+                  handleBlur,
+                  values,
+                  setFieldValue,
+                }) => (
+                  <>
+                    <View style={{gap: 15}}>
+                      <View style={{gap: 5}}>
+                        <Text style={{fontWeight: '700', fontSize: 14}}>
+                          Event Name :
+                        </Text>
+                        <Input
+                          onChangeText={handleChange('name')}
+                          onBlur={handleBlur('name')}
+                          value={values.name}
+                          placeholder="Event Name"
+                        />
+                      </View>
+                      <View style={{gap: 5}}>
+                        <Text style={{fontWeight: '700', fontSize: 14}}>
+                          Event Location :
+                        </Text>
+                        <SelectDropdown
+                          data={getCity}
+                          onSelect={selectedItem => {
+                            handleChange('location')(selectedItem);
+                          }}
+                          defaultValue={values.location}
+                        />
+                      </View>
+                      <View style={{gap: 5}}>
+                        <Text style={{fontWeight: '700', fontSize: 14}}>
+                          Event Price :
+                        </Text>
+                        <SelectDropdown
+                          data={getSections}
+                          onSelect={selectedItem => {
+                            handleChange('price')(selectedItem);
+                          }}
+                          defaultValue={values.price}
+                        />
+                      </View>
+                      <View style={{gap: 5}}>
+                        <Text style={{fontWeight: '700', fontSize: 14}}>
+                          Event Category :
+                        </Text>
+                        <SelectDropdown
+                          data={getCategories}
+                          onSelect={selectedItem => {
+                            handleChange('category')(selectedItem);
+                          }}
+                          defaultValue={values.category}
+                        />
+                      </View>
+                      <View style={{gap: 5}}>
+                        <Text style={{fontWeight: '700', fontSize: 14}}>
+                          Event Date :
+                        </Text>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              fontWeight: '700',
+                              fontSize: 14,
+                              width: 90,
+                            }}>
+                            {moment(detailManageEvent?.date).format(
+                              'DD-MM-YYYY',
+                            )}
+                          </Text>
+                          <Icon
+                            onPress={() => setDatePickerVisible(true)}
+                            name="calendar"
+                            size={25}
+                            color="black"
+                          />
+                        </View>
+                        <DateTimePickerModal
+                          isVisible={isDatePickerVisible}
+                          mode="date"
+                          onConfirm={date => handleConfirm(date, setFieldValue)}
+                          onCancel={hideDatePicker}
+                        />
+                      </View>
+                      <View style={{gap: 5}}>
+                        <Text style={{fontWeight: '700', fontSize: 14}}>
+                          Event Picture :
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => pickImage()}
+                          style={{
+                            borderWidth: 1,
+                            width: 150,
+                            borderRadius: 7,
+                          }}>
+                          <Text style={{textAlign: 'center'}}>Gallery</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={{gap: 5}}>
+                        <Text style={{fontWeight: '700', fontSize: 14}}>
+                          Event Descriptions :
+                        </Text>
+                        <Input
+                          onChangeText={handleChange('detail')}
+                          onBlur={handleBlur('detail')}
+                          value={values.detail}
+                          placeholder="Event Descriptions"
+                        />
+                      </View>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignSelf: 'flex-end',
+                        gap: 20,
+                      }}>
+                      <View
+                        style={{
+                          borderWidth: 1,
+                          alignSelf: 'flex-end',
+                          borderRadius: 10,
+                          backgroundColor: 'blue',
+                        }}>
+                        <TouchableOpacity onPress={handleSubmit}>
+                          <Text
+                            style={{
+                              textAlign: 'center',
+                              paddingHorizontal: 10,
+                              paddingVertical: 10,
+                              color: 'white',
+                              fontWeight: 'bold',
+                            }}>
+                            Update
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View
+                        style={{
+                          borderWidth: 1,
+                          alignSelf: 'flex-end',
+                          borderRadius: 10,
+                          backgroundColor: 'red',
+                        }}>
+                        <TouchableOpacity
+                          onPress={() => setmodalUpdateEvent(false)}>
                           <Text
                             style={{
                               textAlign: 'center',
