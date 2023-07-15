@@ -107,16 +107,17 @@ const MyBooking = () => {
               </Text>
               <View style={{gap: 5}}>
                 <Text style={{fontWeight: '700', fontSize: 14}}>
-                  Event Name : {detailHistory.title}
+                  Event Name : {detailHistory?.title}
                 </Text>
                 <Text style={{fontWeight: '700', fontSize: 14}}>
-                  Event Date : {moment(detailHistory.date).format('DD-MM-YYYY')}
+                  Event Date :{' '}
+                  {moment(detailHistory?.date).format('DD-MM-YYYY')}
                 </Text>
                 <Text style={{fontWeight: '700', fontSize: 14}}>
-                  Payment Status : {detailHistory.name}
+                  Payment Status : {detailHistory?.name}
                 </Text>
                 <Text style={{fontWeight: '700', fontSize: 14}}>
-                  Payment Method : {detailHistory.namePayment}
+                  Payment Method : {detailHistory?.namePayment}
                 </Text>
               </View>
               <View
