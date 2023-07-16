@@ -14,7 +14,6 @@ import SplashScreen from 'react-native-splash-screen';
 import moment from 'moment';
 import Input from '../components/Input';
 import {Formik} from 'formik';
-import Button from '../components/Button';
 
 const Home = ({navigation}) => {
   const [event, setEvent] = React.useState();
@@ -24,45 +23,36 @@ const Home = ({navigation}) => {
     const form = new URLSearchParams({token: deviceToken.token});
     await http(token).post('/device-token', form.toString());
   }, [deviceToken, token]);
-  const [recipient, setRecipient] = React.useState({});
-
-  const getEvents = React.useCallback(
-    async (page = 1) => {
-      const {data} = await http(token).get('/events', {
-        params: {page},
-      });
-      setRecipient(data);
-    },
-    [token],
-  );
-
-  React.useEffect(() => {
-    getEvents(1);
-  }, [getEvents]);
+  const [paginition, setPaginition] = React.useState(1);
 
   React.useEffect(() => {
     const getEvent = async () => {
       try {
-        const {data} = await http(token).get('/events');
+        const {data} = await http(token).get(`/events?page=${paginition}`);
         setEvent(data.results);
       } catch (err) {
         console.log(err);
       }
     };
     getEvent();
-  }, [token]);
+  }, [token, paginition]);
 
   React.useEffect(() => {
     saveToken();
-  }, [saveToken]);
-
-  React.useEffect(() => {
     SplashScreen.hide();
-  }, []);
+  }, [saveToken, paginition]);
 
   const btnSearchEvent = values => {
     const search = new URLSearchParams(values).toString();
     navigation.navigate('Search', {search});
+  };
+
+  const pageNext = () => {
+    setPaginition(paginition + 1);
+  };
+
+  const pagePrev = () => {
+    setPaginition(paginition - 1);
   };
 
   return (
@@ -219,9 +209,7 @@ const Home = ({navigation}) => {
               borderRadius: 10,
               justifyContent: 'center',
             }}>
-            <TouchableOpacity
-              disabled={recipient.pageInfo?.page <= 1}
-              onPress={() => getEvents(recipient.pageInfo?.page - 1)}>
+            <TouchableOpacity onPress={() => pagePrev()}>
               <Text
                 style={{
                   color: 'white',
@@ -232,6 +220,9 @@ const Home = ({navigation}) => {
               </Text>
             </TouchableOpacity>
           </View>
+          <View>
+            <Text style={{fontWeight: 'bold', fontSize: 20}}>{paginition}</Text>
+          </View>
           <View
             style={{
               backgroundColor: '#35A29F',
@@ -240,16 +231,16 @@ const Home = ({navigation}) => {
               borderRadius: 10,
               justifyContent: 'center',
             }}>
-            <TouchableOpacity
-              disabled={
-                recipient.pageInfo?.page === recipient.pageInfo?.totalPage
-              }
-              onPress={() => getEvents(recipient.pageInfo?.page + 1)}
-            />
-            <Text
-              style={{color: 'white', textAlign: 'center', fontWeight: 'bold'}}>
-              Next
-            </Text>
+            <TouchableOpacity onPress={() => pageNext()}>
+              <Text
+                style={{
+                  color: 'white',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                }}>
+                Next
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
