@@ -3,16 +3,21 @@ import React from 'react';
 import globalStyles from '../screens/assets/globalStyles';
 import Icon from 'react-native-vector-icons/Feather';
 
-const Input = ({secureTextEntry, ...rest}) => {
+const Input = ({secureTextEntry, styleInput, styleContainer, ...rest}) => {
   const [visible, setVisible] = React.useState(false);
   return (
-    <View style={globalStyles.containerInput}>
-      {!secureTextEntry && <TextInput {...rest} style={globalStyles.input} />}
+    <View style={{...globalStyles.containerInput, ...styleInput}}>
+      {!secureTextEntry && (
+        <TextInput
+          {...rest}
+          style={{...globalStyles.input, ...styleContainer}}
+        />
+      )}
       {secureTextEntry && (
         <TextInput
           {...rest}
           secureTextEntry={!visible}
-          style={globalStyles.input}
+          style={{...globalStyles.input, ...styleContainer}}
         />
       )}
       {secureTextEntry && (

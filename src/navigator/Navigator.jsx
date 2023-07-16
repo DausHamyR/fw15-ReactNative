@@ -7,7 +7,7 @@ import Booking from '../screens/Booking';
 import Payment from '../screens/Payment';
 import EditProfile from '../screens/EditProfile';
 import ChangePassword from '../screens/ChangePassword';
-import ManageEvent from '../screens/ManageEvent';
+import SearchEvent from '../screens/SearchEvent';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +20,7 @@ const StackNavigator = () => {
       <Stack.Screen name="Payment" component={Payment} />
       <Stack.Screen name="EditProfile" component={EditProfile} />
       <Stack.Screen name="ChangePassword" component={ChangePassword} />
-      <Stack.Screen name="ManageEvent" component={ManageEvent} />
+      <Stack.Screen name="Search" component={SearchEvent} />
     </Stack.Navigator>
   );
 };

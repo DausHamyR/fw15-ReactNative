@@ -12,6 +12,9 @@ import {useSelector} from 'react-redux';
 import http from '../helpers/http';
 import SplashScreen from 'react-native-splash-screen';
 import moment from 'moment';
+import Input from '../components/Input';
+import {Formik} from 'formik';
+import Button from '../components/Button';
 
 const Home = ({navigation}) => {
   const [event, setEvent] = React.useState();
@@ -21,11 +24,21 @@ const Home = ({navigation}) => {
     const form = new URLSearchParams({token: deviceToken.token});
     await http(token).post('/device-token', form.toString());
   }, [deviceToken, token]);
+  const [recipient, setRecipient] = React.useState({});
 
-  // const getEvent = React.useCallback(async () => {
-  //   const {data} = await http(token).get('/events');
-  //   setEvent(data.results);
-  // }, [token]);
+  const getEvents = React.useCallback(
+    async (page = 1) => {
+      const {data} = await http(token).get('/events', {
+        params: {page},
+      });
+      setRecipient(data);
+    },
+    [token],
+  );
+
+  React.useEffect(() => {
+    getEvents(1);
+  }, [getEvents]);
 
   React.useEffect(() => {
     const getEvent = async () => {
@@ -39,11 +52,6 @@ const Home = ({navigation}) => {
     getEvent();
   }, [token]);
 
-  // React.useEffect(() => {
-  //   getEvent();
-  //   console.log(event);
-  // }, [getEvent, event]);
-
   React.useEffect(() => {
     saveToken();
   }, [saveToken]);
@@ -51,6 +59,11 @@ const Home = ({navigation}) => {
   React.useEffect(() => {
     SplashScreen.hide();
   }, []);
+
+  const btnSearchEvent = values => {
+    const search = new URLSearchParams(values).toString();
+    navigation.navigate('Search', {search});
+  };
 
   return (
     <View>
@@ -61,12 +74,40 @@ const Home = ({navigation}) => {
           size={25}
           color="white"
         />
-        <View style={{flexDirection: 'row', gap: 30}}>
-          <Icon name="search" size={25} color="white" />
-          <Icon name="message-square" size={25} color="white" />
-        </View>
+        <Icon name="message-square" size={25} color="white" />
       </View>
-      <View />
+      <Formik
+        initialValues={{
+          search: '',
+        }}
+        onSubmit={btnSearchEvent}
+        enableReinitialize>
+        {({handleSubmit, handleChange, handleBlur, values}) => (
+          <View style={{position: 'relative', top: -90}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Input
+                onChangeText={handleChange('search')}
+                onBlur={handleBlur('search')}
+                placeholder="Search Event"
+                value={values.search}
+                styleContainer={{
+                  backgroundColor: 'white',
+                  width: '90%',
+                  marginHorizontal: '5%',
+                  borderColor: 'white',
+                }}
+              />
+              <Icon
+                name="search"
+                size={25}
+                color="black"
+                style={{position: 'relative', right: 60}}
+                onPress={handleSubmit}
+              />
+            </View>
+          </View>
+        )}
+      </Formik>
       <View style={styles.containerDate}>
         <View style={styles.wrapperDate}>
           <Text style={styles.textDate}>13</Text>
@@ -87,19 +128,17 @@ const Home = ({navigation}) => {
           <Text style={styles.textDate}>16</Text>
           <Text style={styles.textDate}>Thu</Text>
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('ManageEvent')}>
-          <View style={styles.wrapperDate}>
-            <Text style={styles.textDate}>17</Text>
-            <Text style={styles.textDate}>Fri</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.wrapperDate}>
+          <Text style={styles.textDate}>17</Text>
+          <Text style={styles.textDate}>Fri</Text>
+        </View>
       </View>
       <View
         style={{
           backgroundColor: 'white',
-          height: 1000,
+          height: 500,
           position: 'relative',
-          top: -60,
+          top: -110,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}>
@@ -108,7 +147,7 @@ const Home = ({navigation}) => {
             justifyContent: 'space-around',
             alignItems: 'center',
             flexDirection: 'row',
-            height: 100,
+            height: 70,
           }}>
           <Text style={{fontWeight: '700', fontSize: 18}}>Events For You</Text>
           <Image
@@ -120,7 +159,7 @@ const Home = ({navigation}) => {
           data={event}
           keyExtractor={item => item.id}
           renderItem={({item}) => (
-            <View style={{alignItems: 'center', gap: 30}}>
+            <View style={{alignItems: 'center'}}>
               <TouchableOpacity
                 onPress={() =>
                   navigation.navigate('EventDetail', {id: item.id})
@@ -165,6 +204,54 @@ const Home = ({navigation}) => {
           )}
           horizontal={true}
         />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: 20,
+            marginBottom: 25,
+          }}>
+          <View
+            style={{
+              backgroundColor: '#0B666A',
+              width: 60,
+              height: 30,
+              borderRadius: 10,
+              justifyContent: 'center',
+            }}>
+            <TouchableOpacity
+              disabled={recipient.pageInfo?.page <= 1}
+              onPress={() => getEvents(recipient.pageInfo?.page - 1)}>
+              <Text
+                style={{
+                  color: 'white',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                }}>
+                Prev
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              backgroundColor: '#35A29F',
+              width: 60,
+              height: 30,
+              borderRadius: 10,
+              justifyContent: 'center',
+            }}>
+            <TouchableOpacity
+              disabled={
+                recipient.pageInfo?.page === recipient.pageInfo?.totalPage
+              }
+              onPress={() => getEvents(recipient.pageInfo?.page + 1)}
+            />
+            <Text
+              style={{color: 'white', textAlign: 'center', fontWeight: 'bold'}}>
+              Next
+            </Text>
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -173,7 +260,7 @@ const Home = ({navigation}) => {
 const styles = StyleSheet.create({
   wrapper: {
     backgroundColor: '#3366FF',
-    height: 125,
+    height: 160,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 35,
@@ -203,7 +290,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     position: 'relative',
-    top: -25,
+    top: -75,
     height: 200,
     flexDirection: 'row',
     justifyContent: 'space-evenly',

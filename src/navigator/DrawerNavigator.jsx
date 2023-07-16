@@ -8,6 +8,7 @@ import Home from '../screens/Home';
 import Profile from '../screens/Profile';
 import MyBooking from '../screens/MyBooking';
 import MyWishlist from '../screens/MyWishlist';
+import ManageEvent from '../screens/ManageEvent';
 
 const Drawer = createDrawerNavigator();
 
@@ -48,6 +49,11 @@ const DrawerNavigator = () => {
         name="MyWishlist"
         component={MyWishlist}
         options={{drawerIcon: options => drawerIcon(options, 'heart')}}
+      />
+      <Drawer.Screen
+        name="ManageEvent"
+        component={ManageEvent}
+        options={{drawerIcon: options => drawerIcon(options, 'clipboard')}}
       />
       <Drawer.Screen
         name="Logout"
