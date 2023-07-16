@@ -24,6 +24,7 @@ const Home = ({navigation}) => {
     await http(token).post('/device-token', form.toString());
   }, [deviceToken, token]);
   const [paginition, setPaginition] = React.useState(1);
+  const [sort, setSort] = React.useState(false);
 
   React.useEffect(() => {
     const getEvent = async () => {
@@ -35,12 +36,13 @@ const Home = ({navigation}) => {
       }
     };
     getEvent();
-  }, [token, paginition]);
+  }, [token, paginition, event]);
 
   React.useEffect(() => {
+    console.log(sort);
     saveToken();
     SplashScreen.hide();
-  }, [saveToken, paginition]);
+  }, [saveToken, paginition, sort]);
 
   const btnSearchEvent = values => {
     const search = new URLSearchParams(values).toString();
@@ -53,6 +55,10 @@ const Home = ({navigation}) => {
 
   const pagePrev = () => {
     setPaginition(paginition - 1);
+  };
+
+  const sorting = () => {
+    setSort(prevSort => !prevSort);
   };
 
   return (
@@ -140,10 +146,13 @@ const Home = ({navigation}) => {
             height: 70,
           }}>
           <Text style={{fontWeight: '700', fontSize: 18}}>Events For You</Text>
-          <Image
-            source={require('./assets/Group8.png')}
-            style={{width: 70, height: 70}}
-          />
+          {sort && <Text>Sort di Tampilkan</Text>}
+          <TouchableOpacity onPress={() => sorting()}>
+            <Image
+              source={require('./assets/Group8.png')}
+              style={{width: 70, height: 70}}
+            />
+          </TouchableOpacity>
         </View>
         <FlatList
           data={event}

@@ -135,7 +135,6 @@ const ManageEvent = () => {
 
   const btnCreateEvent = async values => {
     // setLoading(true);
-    console.log(values);
     const form = new FormData();
     Object.keys(values).forEach(key => {
       if (values[key]) {
@@ -223,7 +222,7 @@ const ManageEvent = () => {
         {successMessage && <Alert variant="success">{successMessage}</Alert>}
         <FlatList
           data={getManageEvent}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item?.id}
           renderItem={({item}) => (
             <View
               style={{
@@ -241,21 +240,21 @@ const ManageEvent = () => {
                 }}>
                 <Text
                   style={{color: '#FF8900', fontWeight: '700', fontSize: 15}}>
-                  {moment(item.date).format('DD')}
+                  {moment(item?.date).format('DD')}
                 </Text>
                 <Text
                   style={{color: '#C1C5D0', fontWeight: '700', fontSize: 15}}>
-                  {moment(item.date).format('dddd')}
+                  {moment(item?.date).format('dddd')}
                 </Text>
               </View>
               <View style={{gap: 10}}>
                 <Text
                   style={{fontWeight: 'bold', fontSize: 20, lineHeight: 35}}>
-                  {item.title}
+                  {item?.title}
                 </Text>
                 <View style={{gap: 5}}>
-                  <Text>{moment(item.date).format('DD-MM-YYYY')}</Text>
-                  <Text>{item.name}</Text>
+                  <Text>{moment(item?.date).format('DD-MM-YYYY')}</Text>
+                  <Text>{item?.name}</Text>
                   <View
                     style={{
                       flexDirection: 'row',
@@ -263,17 +262,17 @@ const ManageEvent = () => {
                       alignItems: 'center',
                     }}>
                     <TouchableOpacity
-                      onPress={() => getDetailManageEvent(item.id)}>
+                      onPress={() => getDetailManageEvent(item?.id)}>
                       <Text style={{color: 'green', fontWeight: '600'}}>
                         Detail
                       </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => updateEvent(item.id)}>
+                    <TouchableOpacity onPress={() => updateEvent(item?.id)}>
                       <Text style={{color: 'blue', fontWeight: '600'}}>
                         update
                       </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => removeEvent(item.id)}>
+                    <TouchableOpacity onPress={() => removeEvent(item?.id)}>
                       <Text style={{color: 'red', fontWeight: '600'}}>
                         Delete
                       </Text>
