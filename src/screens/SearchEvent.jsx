@@ -34,6 +34,7 @@ const SearchEvent = ({navigation}) => {
           marginTop: '-70',
           borderRadius: 20,
           paddingTop: 30,
+          height: 650,
         }}>
         <FlatList
           data={searchResults}

@@ -24,19 +24,23 @@ const Home = ({navigation}) => {
     await http(token).post('/device-token', form.toString());
   }, [deviceToken, token]);
   const [paginition, setPaginition] = React.useState(1);
+  const [sortBy, setSortBy] = React.useState('ASC');
+  const [sortName, setSortName] = React.useState('id');
   const [sort, setSort] = React.useState(false);
 
   React.useEffect(() => {
     const getEvent = async () => {
       try {
-        const {data} = await http(token).get(`/events?page=${paginition}`);
+        const {data} = await http(token).get(
+          `/events?page=${paginition}&sortBy=${sortBy}&sort=${sortName}`,
+        );
         setEvent(data.results);
       } catch (err) {
         console.log(err);
       }
     };
     getEvent();
-  }, [token, paginition, event]);
+  }, [token, paginition, event, sortBy, sortName]);
 
   React.useEffect(() => {
     console.log(sort);
@@ -59,6 +63,16 @@ const Home = ({navigation}) => {
 
   const sorting = () => {
     setSort(prevSort => !prevSort);
+  };
+
+  const nearestEvent = () => {
+    setSortName('date');
+    setSortBy('ASC');
+  };
+
+  const latestEvent = () => {
+    setSortName('id');
+    setSortBy('DESC');
   };
 
   return (
@@ -132,7 +146,7 @@ const Home = ({navigation}) => {
       <View
         style={{
           backgroundColor: 'white',
-          height: 500,
+          height: 530,
           position: 'relative',
           top: -110,
           borderTopLeftRadius: 40,
@@ -143,10 +157,49 @@ const Home = ({navigation}) => {
             justifyContent: 'space-around',
             alignItems: 'center',
             flexDirection: 'row',
-            height: 70,
+            height: 100,
           }}>
           <Text style={{fontWeight: '700', fontSize: 18}}>Events For You</Text>
-          {sort && <Text>Sort di Tampilkan</Text>}
+          {sort && (
+            <View style={{gap: 10}}>
+              <TouchableOpacity onPress={() => latestEvent()}>
+                <View
+                  style={{
+                    backgroundColor: '#A076F9',
+                    borderRadius: 5,
+                    paddingVertical: 5,
+                    paddingHorizontal: 5,
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                    }}>
+                    Latest Event
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => nearestEvent()}>
+                <View
+                  style={{
+                    backgroundColor: '#A8A196',
+                    borderRadius: 5,
+                    paddingVertical: 5,
+                    paddingHorizontal: 5,
+                  }}>
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                    }}>
+                    Nearest Event
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
           <TouchableOpacity onPress={() => sorting()}>
             <Image
               source={require('./assets/Group8.png')}
@@ -208,7 +261,7 @@ const Home = ({navigation}) => {
             flexDirection: 'row',
             justifyContent: 'center',
             gap: 20,
-            marginBottom: 25,
+            marginBottom: 30,
           }}>
           <View
             style={{
@@ -269,8 +322,8 @@ const styles = StyleSheet.create({
   wrapperDate: {alignItems: 'center', flexDirection: 'column'},
   wrapperDateYellow: {
     borderWidth: 1,
-    paddingTop: 25,
-    paddingBottom: 25,
+    paddingTop: 10,
+    paddingBottom: 10,
     paddingHorizontal: 8,
     borderRadius: 20,
     borderColor: '#FF8900',
@@ -291,7 +344,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     position: 'relative',
     top: -75,
-    height: 200,
+    height: 170,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
