@@ -74,6 +74,7 @@ const Home = ({navigation}) => {
   const latestEvent = () => {
     setSortName('id');
     setSortBy('DESC');
+    console.log('tes');
   };
 
   return (
