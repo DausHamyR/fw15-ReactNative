@@ -19,33 +19,35 @@ const Home = ({navigation}) => {
   const [event, setEvent] = React.useState();
   const deviceToken = useSelector(state => state.deviceToken.data);
   const token = useSelector(state => state.auth.token);
-  const saveToken = useCallback(async () => {
-    const form = new URLSearchParams({token: deviceToken.token});
-    await http(token).post('/device-token', form.toString());
-  }, [deviceToken, token]);
   const [paginition, setPaginition] = React.useState(1);
   const [sortBy, setSortBy] = React.useState('ASC');
   const [sortName, setSortName] = React.useState('id');
   const [sort, setSort] = React.useState(false);
 
-  React.useEffect(() => {
-    const getEvent = async () => {
-      try {
-        const {data} = await http(token).get(
-          `/events?page=${paginition}&sortBy=${sortBy}&sort=${sortName}`,
-        );
-        setEvent(data.results);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getEvent();
-  }, [token, paginition, event, sortBy, sortName]);
+  const saveToken = useCallback(async () => {
+    const form = new URLSearchParams({token: deviceToken.token});
+    await http(token).post('/device-token', form.toString());
+  }, [deviceToken, token]);
 
   React.useEffect(() => {
     saveToken();
     SplashScreen.hide();
   }, [saveToken, paginition, sort]);
+
+  const getEvent = useCallback(async () => {
+    try {
+      const {data} = await http(token).get(
+        `/events?page=${paginition}&sortBy=${sortBy}&sort=${sortName}`,
+      );
+      setEvent(data.results);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [token, paginition, sortBy, sortName]);
+
+  React.useEffect(() => {
+    getEvent();
+  }, [getEvent]);
 
   const btnSearchEvent = values => {
     const search = new URLSearchParams(values).toString();
@@ -72,6 +74,7 @@ const Home = ({navigation}) => {
   const latestEvent = () => {
     setSortName('id');
     setSortBy('DESC');
+    console.log('tes');
   };
 
   return (
