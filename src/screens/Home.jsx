@@ -43,7 +43,6 @@ const Home = ({navigation}) => {
   }, [token, paginition, event, sortBy, sortName]);
 
   React.useEffect(() => {
-    console.log(sort);
     saveToken();
     SplashScreen.hide();
   }, [saveToken, paginition, sort]);
