@@ -47,7 +47,7 @@ const Home = ({navigation}) => {
 
   React.useEffect(() => {
     getEvent();
-  }, [getEvent]);
+  }, [getEvent, event]);
 
   const btnSearchEvent = values => {
     const search = new URLSearchParams(values).toString();
@@ -74,7 +74,6 @@ const Home = ({navigation}) => {
   const latestEvent = () => {
     setSortName('id');
     setSortBy('DESC');
-    console.log('tes');
   };
 
   return (
