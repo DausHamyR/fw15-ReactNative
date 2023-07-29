@@ -164,13 +164,11 @@ const ManageEvent = () => {
     if (selectedPicture) {
       form.append('picture', selectedPicture);
     }
-    console.log(form, 'form');
     const {data} = await http(token).post('/events/managem', form, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log(data.results);
     setGetManageEvent(data.results);
     setModalCreateEvent(false);
     setSuccessMessage('Create Events successfully');
@@ -181,15 +179,20 @@ const ManageEvent = () => {
     const form = new FormData();
     Object.keys(values).forEach(key => {
       if (values[key]) {
-        if (key === 'price') {
-          const priceId = (values.price = 2);
-          form.append('price', priceId);
-        } else if (key === 'location') {
-          const cityId = (values.location = 2);
-          form.append('location', cityId);
+        if (key === 'location') {
+          const locationId = getCity.indexOf(values.location);
+          form.append('location', locationId + 1);
         } else if (key === 'category') {
-          const categoryId = (values.category = 2);
-          form.append('category', categoryId);
+          const categoryId = getCategories.indexOf(values.category);
+          form.append('category', categoryId + 1);
+        } else if (key === 'price') {
+          const priceId = getSections.indexOf(values.price);
+          form.append('price', priceId + 1);
+        } else if (key === 'date') {
+          form.append(
+            'date',
+            moment(values.date, 'DD-MM-YYYY').format('YYYY-MM-DD'),
+          );
         } else {
           form.append(key, values[key]);
         }
@@ -198,13 +201,11 @@ const ManageEvent = () => {
     if (selectedPicture) {
       form.append('picture', selectedPicture);
     }
-    console.log(form, 'form');
-    const {data} = await http(token).patch(`/events/manage/${idEvent}`, form, {
+    const {data} = await http(token).patch(`/events/managem/${idEvent}`, form, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log(data.results);
     setGetManageEvent(data.results);
     setmodalUpdateEvent(false);
     setSuccessMessage('Update Events successfully');
