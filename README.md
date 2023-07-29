@@ -4,7 +4,7 @@
 ![alt text](https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643795/Amat%20Daus/1690643793836.png)
 ![alt text](https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643886/Amat%20Daus/1690643885207.png)
 ## Introduction
-Cruelty Free is a website for finding information or buying tickets to take part in events held around the world. Users can find information about when the event will be held, where the event will be held, and much more. And on the website you can also create events, ticket prices, and event management for event providers
+Cruelty Free is a mobile application for finding information or buying tickets to attend events held around the world. Users can find out information about when the event will be held, where the event will be held, and much more. And in the application you can also create events, ticket prices, and event management for event providers
 
 ## Features Cruelty Free
 - Looking for existing Events
@@ -19,7 +19,7 @@ Cruelty Free is a website for finding information or buying tickets to take part
 ## Tech and Technology used
 As for the tech that we used to make this website
 
-- [ReactJs] - I use the javascript framework ReactJs to make the website dynamic, it helps to recall components for reuse
+- [React Native] - I use React Native to create mobile applications on Android and IOS
 - [Tailwind] - helps website responsiveness and speeds up style work with internal css
 - [Redux] - helps save state and can be used anywhere
 - [Axios] - for fetching data from backend for CRUD integration
