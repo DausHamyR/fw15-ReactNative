@@ -28,6 +28,15 @@ const ManageEvent = () => {
   const [successMessage, setSuccessMessage] = React.useState('');
   const [idEvent, setIdEvent] = React.useState();
 
+  React.useEffect(() => {
+    if (successMessage) {
+      const timeout = setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [successMessage]);
+
   async function removeEvent(id) {
     try {
       await http(token).delete(`/events/manage/${id}`);
@@ -83,46 +92,41 @@ const ManageEvent = () => {
     }
   };
 
+  const effectGetSections = useCallback(async () => {
+    try {
+      const {data} = await http(token).get('/sections');
+      const mapSections = data.results.map(dataSections => dataSections.price);
+      setGetSections(mapSections);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [token]);
+
+  const effectGetCity = useCallback(async () => {
+    try {
+      const {data} = await http(token).get('/city');
+      const mapCity = data.results.map(dataCity => dataCity.name);
+      setGetCity(mapCity);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [token]);
+
+  const effectGetCategories = useCallback(async () => {
+    try {
+      const {data} = await http(token).get('/categories?limit=99');
+      const mapCategories = data.results.map(dataCate => dataCate.name);
+      setGetCategories(mapCategories);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [token]);
+
   React.useEffect(() => {
-    const effectGetSections = async () => {
-      try {
-        const {data} = await http(token).get('/sections');
-        const mapSections = data.results.map(
-          dataSections => dataSections.price,
-        );
-        setGetSections(mapSections);
-      } catch (err) {
-        console.log(err);
-      }
-    };
     effectGetSections();
-  }, [token, getSections]);
-
-  React.useEffect(() => {
-    const effectGetCity = async () => {
-      try {
-        const {data} = await http(token).get('/city');
-        // const mapCity = data.results.map(dataCity => dataCity.name);
-        setGetCity(data.results);
-      } catch (err) {
-        console.log(err);
-      }
-    };
     effectGetCity();
-  }, [token, getCity]);
-
-  React.useEffect(() => {
-    const effectGetCategories = async () => {
-      try {
-        const {data} = await http(token).get('/categories');
-        const mapCategories = data.results.map(dataCate => dataCate.name);
-        setGetCategories(mapCategories);
-      } catch (err) {
-        console.log(err);
-      }
-    };
     effectGetCategories();
-  }, [token, getCategories]);
+  }, [effectGetSections, effectGetCity, effectGetCategories]);
 
   const hideDatePicker = () => {
     setDatePickerVisible(false);
@@ -136,15 +140,22 @@ const ManageEvent = () => {
   const btnCreateEvent = async values => {
     // setLoading(true);
     const form = new FormData();
-    console.log(values);
     Object.keys(values).forEach(key => {
       if (values[key]) {
-        if (key === 'price') {
-          const priceId = (values.price = 3);
-          form.append('price', priceId);
+        if (key === 'location') {
+          const locationId = getCity.indexOf(values.location);
+          form.append('location', locationId + 1);
         } else if (key === 'category') {
-          const categoryId = (values.category = 3);
-          form.append('category', categoryId);
+          const categoryId = getCategories.indexOf(values.category);
+          form.append('category', categoryId + 1);
+        } else if (key === 'price') {
+          const priceId = getSections.indexOf(values.price);
+          form.append('price', priceId + 1);
+        } else if (key === 'date') {
+          form.append(
+            'date',
+            moment(values.date, 'DD-MM-YYYY').format('YYYY-MM-DD'),
+          );
         } else {
           form.append(key, values[key]);
         }
@@ -154,7 +165,7 @@ const ManageEvent = () => {
       form.append('picture', selectedPicture);
     }
     console.log(form, 'form');
-    const {data} = await http(token).post('/events/manage', form, {
+    const {data} = await http(token).post('/events/managem', form, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -377,9 +388,9 @@ const ManageEvent = () => {
                           Event Location :
                         </Text>
                         <SelectDropdown
-                          data={getCity.map(city => city.name)}
+                          data={getCity}
                           onSelect={selectedItem => {
-                            handleChange('location')(selectedItem.id);
+                            handleChange('location')(selectedItem);
                           }}
                           defaultValue={values.location}
                         />

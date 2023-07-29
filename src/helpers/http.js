@@ -13,4 +13,7 @@ const http = token => {
   return instance;
 };
 
+console.log(BACKEND_URL, 'tes');
+console.log(http());
+
 export default http;
