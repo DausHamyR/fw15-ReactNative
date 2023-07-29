@@ -23,6 +23,7 @@ import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Feather';
 import SelectDropdown from 'react-native-select-dropdown';
 import {dataProfile} from '../redux/reducers/profile';
+import Modal from 'react-native-modal';
 
 const EditProfile = () => {
   const dispatch = useDispatch();
@@ -36,8 +37,9 @@ const EditProfile = () => {
   // const [loading, setLoading] = React.useState(false);
   const [isDatePickerVisible, setDatePickerVisible] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
   const profession = [
-    'Web developer',
+    'Fullstack Developer',
     'Backend Developer',
     'Frontend Developer',
     'Mobile Developer',
@@ -52,6 +54,15 @@ const EditProfile = () => {
     setFieldValue('birthDate', moment(date).format('DD-MM-YYYY'));
     hideDatePicker();
   };
+
+  React.useEffect(() => {
+    if (successMessage) {
+      const timeout = setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [successMessage]);
 
   // const ImagePicker = () => {
   //   let options = {
@@ -96,7 +107,7 @@ const EditProfile = () => {
   }, [token, selectedDate]);
 
   const editProfile = async values => {
-    // setLoading(true);
+    setLoading(true);
     const form = new FormData();
     Object.keys(values).forEach(key => {
       if (values[key]) {
@@ -127,7 +138,7 @@ const EditProfile = () => {
     setEditUsername(false);
     setEditEmail(false);
     setEditPhoneNumber(false);
-    // setLoading(false);
+    setLoading(false);
   };
 
   // React.useEffect(() => {
@@ -406,6 +417,7 @@ const EditProfile = () => {
               </SafeAreaView>
             </View>
           </View>
+          <Modal isVisible={loading} />
         </ScrollView>
       )}
     </Formik>

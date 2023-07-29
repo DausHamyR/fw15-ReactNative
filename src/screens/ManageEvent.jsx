@@ -27,6 +27,7 @@ const ManageEvent = () => {
   const [selectedPicture, setSelectedPicture] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
   const [idEvent, setIdEvent] = React.useState();
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     if (successMessage) {
@@ -138,7 +139,7 @@ const ManageEvent = () => {
   };
 
   const btnCreateEvent = async values => {
-    // setLoading(true);
+    setLoading(true);
     const form = new FormData();
     Object.keys(values).forEach(key => {
       if (values[key]) {
@@ -170,12 +171,13 @@ const ManageEvent = () => {
       },
     });
     setGetManageEvent(data.results);
+    setLoading(false);
     setModalCreateEvent(false);
     setSuccessMessage('Create Events successfully');
   };
 
   const btnUpdateEvent = async values => {
-    // setLoading(true);
+    setLoading(true);
     const form = new FormData();
     Object.keys(values).forEach(key => {
       if (values[key]) {
@@ -207,6 +209,7 @@ const ManageEvent = () => {
       },
     });
     setGetManageEvent(data.results);
+    setLoading(false);
     setmodalUpdateEvent(false);
     setSuccessMessage('Update Events successfully');
   };
@@ -724,6 +727,7 @@ const ManageEvent = () => {
             </View>
           </View>
         </Modal>
+        <Modal isVisible={loading} />
       </View>
     </View>
   );
