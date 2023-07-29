@@ -1,9 +1,8 @@
 # Cruelty Free
 <img src="https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643667/Amat%20Daus/1690643665266.png" alt="alt text" width="300">
-![alt text](https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643667/Amat%20Daus/1690643665266.png)
-![alt text](https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643845/Amat%20Daus/1690643843186.png)
-![alt text](https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643795/Amat%20Daus/1690643793836.png)
-![alt text](https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643886/Amat%20Daus/1690643885207.png)
+<img src="https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643845/Amat%20Daus/1690643843186.png" alt="alt text" width="300">
+<img src="https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643795/Amat%20Daus/1690643793836" alt="alt text" width="300">
+<img src="https://res.cloudinary.com/dxs0yxeyr/image/upload/v1690643886/Amat%20Daus/1690643885207" alt="alt text" width="300">
 ## Introduction
 Cruelty Free is a mobile application for finding information or buying tickets to attend events held around the world. Users can find out information about when the event will be held, where the event will be held, and much more. And in the application you can also create events, ticket prices, and event management for event providers
 
