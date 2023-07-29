@@ -9,9 +9,9 @@ import Icon from 'react-native-vector-icons/Feather';
 const EventDetail = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const {id} = route.params;
   const token = useSelector(state => state.auth.token);
   const [event, setEvent] = React.useState({});
-  const {id} = route.params;
   const [wishlist, setWishlist] = React.useState(false);
 
   async function postWishlist(id) {
@@ -32,6 +32,7 @@ const EventDetail = () => {
   }
 
   React.useEffect(() => {
+    console.log(id, 'event detail');
     async function getWishlist(id) {
       const {data} = await http(token).get(`/wishlists/${id}`);
       if (!data) {
@@ -58,7 +59,7 @@ const EventDetail = () => {
   return (
     <View style={styles.wrapper}>
       <Image
-        source={{uri: event.picture}}
+        source={{uri: event?.picture}}
         style={{width: '100%', height: '50%'}}
       />
       <View
@@ -214,7 +215,8 @@ const EventDetail = () => {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <TouchableOpacity onPress={() => navigation.navigate('Booking')}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Booking', {eventId: id})}>
             <Text style={{color: 'white', fontSize: 20, fontWeight: '600'}}>
               Buy Tickets
             </Text>

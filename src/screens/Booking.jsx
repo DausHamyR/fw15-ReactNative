@@ -1,12 +1,12 @@
 import {View, Text, Image, TouchableOpacity, FlatList} from 'react-native';
 import React from 'react';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import http from '../helpers/http';
 import {useDispatch, useSelector} from 'react-redux';
 import Icon from 'react-native-vector-icons/Feather';
 import {sectionPrice} from '../redux/reducers/sectionPrice';
 
-const Booking = () => {
+const Booking = ({route}) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const token = useSelector(state => state.auth.token);
@@ -14,6 +14,8 @@ const Booking = () => {
   let [total, setTotal] = React.useState(0);
   let [quantity, setQuantity] = React.useState(0);
   let [sectionId, setSectionId] = React.useState(0);
+  // const route = useRoute();
+  const {eventId} = route.params;
 
   const dataSection = React.useCallback(async () => {
     try {
@@ -48,9 +50,9 @@ const Booking = () => {
 
   const postReservation = async () => {
     const form = new URLSearchParams({
-      eventId: 1,
-      sectionId: sectionId,
-      quantity: quantity,
+      eventId,
+      sectionId,
+      quantity,
     }).toString();
     const {data} = await http(token).post('/reservations', form);
     if (data) {
@@ -65,6 +67,10 @@ const Booking = () => {
       setSectionId(0);
     }
   }, [dataSection, sectionId, total]);
+
+  // React.useEffect(() => {
+  //   console.log(eventId, 'eventId');
+  // }, [eventId]);
 
   return (
     <View style={{backgroundColor: 'white', height: '100%'}}>

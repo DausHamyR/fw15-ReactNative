@@ -52,7 +52,7 @@ const Payment = () => {
               // style={{width: '100%', height: '50%'}}
             />
             <Text style={{fontWeight: '700', fontSize: 17, marginLeft: 6}}>
-              Card
+              Bank BCA
             </Text>
           </View>
           <Image source={require('./assets/chevron-down.png')} />
@@ -76,7 +76,7 @@ const Payment = () => {
               />
               <Image source={require('./assets/Group811.png')} />
               <Text style={{fontWeight: '700', fontSize: 17, marginLeft: 6}}>
-                Bank Transfer
+                Bank Mandiri
               </Text>
             </View>
             <Image source={require('./assets/chevron-down.png')} />
@@ -95,7 +95,7 @@ const Payment = () => {
               />
               <Image source={require('./assets/Group826.png')} />
               <Text style={{fontWeight: '700', fontSize: 17, marginLeft: 6}}>
-                Retail
+                Bank BRI
               </Text>
             </View>
             <Image source={require('./assets/chevron-down.png')} />
@@ -114,7 +114,7 @@ const Payment = () => {
               />
               <Image source={require('./assets/Group830.png')} />
               <Text style={{fontWeight: '700', fontSize: 17, marginLeft: 6}}>
-                E-Money
+                Bank BNI
               </Text>
             </View>
             <Image source={require('./assets/chevron-down.png')} />

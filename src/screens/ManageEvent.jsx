@@ -30,24 +30,24 @@ const ManageEvent = () => {
 
   async function removeEvent(id) {
     try {
-      console.log(id);
       await http(token).delete(`/events/manage/${id}`);
     } catch (err) {
       console.log(err);
     }
   }
 
+  const manageEvent = useCallback(async () => {
+    try {
+      const {data} = await http(token).get('/events/manage');
+      setGetManageEvent(data.results);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [token]);
+
   React.useEffect(() => {
-    const manageEvent = async () => {
-      try {
-        const {data} = await http(token).get('/events/manage');
-        setGetManageEvent(data.results);
-      } catch (err) {
-        console.log(err);
-      }
-    };
     manageEvent();
-  }, [token, getManageEvent]);
+  }, [manageEvent, getManageEvent]);
 
   const getDetailManageEvent = useCallback(
     async id => {
@@ -102,8 +102,8 @@ const ManageEvent = () => {
     const effectGetCity = async () => {
       try {
         const {data} = await http(token).get('/city');
-        const mapCity = data.results.map(dataCity => dataCity.name);
-        setGetCity(mapCity);
+        // const mapCity = data.results.map(dataCity => dataCity.name);
+        setGetCity(data.results);
       } catch (err) {
         console.log(err);
       }
@@ -136,14 +136,12 @@ const ManageEvent = () => {
   const btnCreateEvent = async values => {
     // setLoading(true);
     const form = new FormData();
+    console.log(values);
     Object.keys(values).forEach(key => {
       if (values[key]) {
         if (key === 'price') {
           const priceId = (values.price = 3);
           form.append('price', priceId);
-        } else if (key === 'location') {
-          const cityId = (values.location = 5);
-          form.append('location', cityId);
         } else if (key === 'category') {
           const categoryId = (values.category = 3);
           form.append('category', categoryId);
@@ -379,9 +377,9 @@ const ManageEvent = () => {
                           Event Location :
                         </Text>
                         <SelectDropdown
-                          data={getCity}
+                          data={getCity.map(city => city.name)}
                           onSelect={selectedItem => {
-                            handleChange('location')(selectedItem);
+                            handleChange('location')(selectedItem.id);
                           }}
                           defaultValue={values.location}
                         />
